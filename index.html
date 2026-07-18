@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Repair Diagnostic Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #1a202c;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        h2 {
+            color: #2b6cb0;
+            margin-top: 0;
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #cbd5e0;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #2b6cb0;
+        }
+        .result-box {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #ebf8ff;
+            border-left: 5px solid #3182ce;
+            border-radius: 4px;
+            line-height: 1.6;
+        }
+        .solution-img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 15px;
+            border-radius: 6px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: block;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Mobile Repair Diagnostic Tool</h1>
+        <p class="subtitle">SMC Panic Logs & Hardware Solutions Database</p>
+
+        <div class="card">
+            <h2>Error / Panic Log Decoder</h2>
+            <p>Apna panic code (jaise 0X140000) enter karein:</p>
+            <div class="search-box">
+                <input type="text" id="panicInput" placeholder="e.g., 0X80000, 0X140000...">
+                <button onclick="decodePanic()">Decode Code</button>
+            </div>
+            <div id="panicResult" class="result-box hidden"></div>
+        </div>
+    </div>
+
+    <script>
+        function decodePanic() {
+            let code = document.getElementById('panicInput').value.trim().toUpperCase();
+            let resultDiv = document.getElementById('panicResult');
+            
+            if(!code) return alert("Pehle koi code enter karo!");
+
+            fetch('/decode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: code })
+            })
+            .then(response => response.json())
+            .then(result => {
+                resultDiv.classList.remove('hidden');
+                if(result.status === "success") {
+                    let imgTag = "";
+                    if(result.data.image) {
+                        imgTag = `<br><img src="/${result.data.image}" class="solution-img" alt="Solution Diagram">`;
+                    }
+                    resultDiv.innerHTML = `<strong>Culprit Component:</strong> ${result.data.culprit}<br><strong>Solution:</strong> ${result.data.solution}${imgTag}`;
+                } else {
+                    resultDiv.innerHTML = `<strong>Result:</strong> ${result.message}`;
+                }
+            })
+            .catch(error => {
+                resultDiv.classList.remove('hidden');
+                resultDiv.innerHTML = "Server se connect nahi ho pa raha hai!";
+            });
+        }
+    </script>
+</body>
+</html>
