@@ -3,110 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mobile Repair Diagnostic Tool</title>
+    <title>ItzAamir Mobile Repair Diagnostic Tool</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
+            background-color: #0f172a; /* Dark Premium Theme */
+            color: #e2e8f0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f9;
-            color: #333;
-            margin: 0;
-            padding: 20px;
         }
-        .container {
-            max-width: 800px;
+        .app-container {
+            max-width: 500px; /* Mobile App jaisa view dene ke liye */
             margin: 0 auto;
-            padding: 20px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
         }
-        h1 {
-            text-align: center;
-            color: #1a202c;
-            margin-bottom: 5px;
+        /* Telegram jise stacked buttons ki styling */
+        .btn-menu-full {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            font-weight: 600;
+            border: 1px solid #cbd5e1;
+            padding: 12px;
+            border-radius: 10px;
+            width: 100%;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
         }
-        .subtitle {
-            text-align: center;
-            color: #718096;
-            margin-bottom: 30px;
+        .btn-menu-full:hover {
+            background-color: #e2e8f0;
+            transform: scale(0.99);
         }
-        .card {
-            background: #ffffff;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-        h2 {
-            color: #2b6cb0;
-            margin-top: 0;
-        }
-        .search-box {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        input[type="text"] {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #cbd5e0;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        button {
-            background-color: #3182ce;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
+        /* Alphabetical mini buttons */
+        .btn-alpha {
+            background-color: #e2e8f0;
+            color: #1e293b;
             font-weight: bold;
-            transition: background 0.2s;
+            border: 1px solid #cbd5e1;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 0.9rem;
         }
-        button:hover {
-            background-color: #2b6cb0;
+        .btn-alpha:hover {
+            background-color: #cbd5e1;
         }
         .result-box {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #ebf8ff;
-            border-left: 5px solid #3182ce;
-            border-radius: 4px;
-            line-height: 1.6;
+            background-color: #0f172a;
+            border-left: 5px solid #3b82f6;
+            border-radius: 8px;
+            color: #f8fafc;
         }
         .solution-img {
             max-width: 100%;
             height: auto;
-            margin-top: 15px;
-            border-radius: 6px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            display: block;
-        }
-        .hidden {
-            display: none;
+            border-radius: 8px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔧 Mobile Repair Diagnostic Tool</h1>
-        <p class="subtitle">SMC Panic Logs & Hardware Solutions Database</p>
 
-        <div class="card">
-            <h2>Error / Panic Log Decoder</h2>
-            <p>Apna panic code (jaise 0X140000) enter karein:</p>
-            <div class="search-box">
-                <input type="text" id="panicInput" placeholder="e.g., 0X80000, 0X140000...">
-                <button onclick="decodePanic()">Decode Code</button>
+    <div class="container my-4">
+        <div class="app-container">
+            
+            <!-- Header Section -->
+            <div class="text-center mb-3 border-bottom border-secondary pb-2">
+                <h4 class="fw-bold text-info m-0"><i class="fa-solid fa-robot me-2"></i>iDoctor.Panic Panel</h4>
+                <p class="text-muted small mb-1">Aamir Khan Automated Diagnostic Bot</p>
             </div>
-            <div id="panicResult" class="result-box hidden"></div>
+
+            <!-- Input / Search Box -->
+            <div class="mb-3">
+                <div class="input-group">
+                    <input type="text" id="panicInput" class="form-control bg-dark text-white border-secondary" placeholder="Type or select code below...">
+                    <button class="btn btn-primary" onclick="decodePanic()"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+            </div>
+
+            <!-- Dynamic Output Box Area -->
+            <div id="panicResult" class="result-box p-3 mb-3 d-none"></div>
+
+            <!-- ================= MAIN KEYBOARD BUTTONS START ================= -->
+            <div class="menu-keyboard-section">
+                
+                <!-- Row 1: Full Width Button -->
+                <button class="btn btn-menu-full" onclick="setDiagnosticMode('SMC PANIC', 'SMC_ASSERTION')">
+                    SMC PANIC - ASSERTION
+                </button>
+
+                <!-- Row 2: Full Width Button -->
+                <button class="btn btn-menu-full" onclick="setDiagnosticMode('WATCHDOG', 'USERSPACE_TIMEOUT')">
+                    Userspace watchdog timeout
+                </button>
+
+                <!-- Row 3: Half-Half Side by Side Buttons -->
+                <div class="row g-2 mb-2">
+                    <div class="col-6">
+                        <button class="btn btn-menu-full m-0" onclick="setDiagnosticMode('I2C', 'I2C_BUS_ERR')">i2c</button>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-menu-full m-0" onclick="setDiagnosticMode('AOP', 'AOP_PANIC')">AOP PANIC</button>
+                    </div>
+                </div>
+
+                <!-- Row 4 Onwards: Alphabet Grid (3 Buttons Per Row) -->
+                <div class="row g-2">
+                    <div class="col-4"><button class="btn btn-alpha" onclick="setDiagnosticMode('A', 'A_CODE')">A</button></div>
+                    <div class="col-4"><button class="btn btn-alpha" onclick="setDiagnosticMode('B', 'B_CODE')">B</button></div>
+                    <div class="col-4"><button class="btn btn-alpha" onclick="setDiagnosticMode('C', 'C_CODE')">C</button></div>
+                    
+                    <div class="col-4"><button class="btn btn-alpha" onclick="setDiagnosticMode('D', 'D_CODE')">D</button></div>
+                    <div class="col-4"><button class="btn btn-alpha" onclick="setDiagnosticMode('E', 'E_CODE')">E</button></div>
+                    <div class="col-4"><button class="btn btn-alpha" onclick="setDiagnosticMode('F', 'F_CODE')">F</button></div>
+                    
+                    <div class="col-4"><button class="btn btn-alpha" onclick="setDiagnosticMode('H', 'H_CODE')">H</button></div>
+                    <div class="col-4"><button class="btn btn-alpha" onclick="setDiagnosticMode('I', 'I_CODE')">I</button></div>
+                    <div class="col-4"><button class="btn btn-alpha" onclick="setDiagnosticMode('K', 'K_CODE')">K</button></div>
+                    
+                    <div class="col-4"><button class="btn btn-alpha" onclick="setDiagnosticMode('L', 'L_CODE')">L</button></div>
+                    <div class="col-4"><button class="btn btn-alpha" onclick="setDiagnosticMode('M', 'M_CODE')">M</button></div>
+                    <div class="col-4"><button class="btn btn-alpha" onclick="setDiagnosticMode('N', 'N_CODE')">N</button></div>
+
+                    <div class="col-4"><button class="btn btn-alpha" onclick="setDiagnosticMode('P', 'P_CODE')">P</button></div>
+                    <div class="col-4"><button class="btn btn-alpha" onclick="setDiagnosticMode('R', 'R_CODE')">R</button></div>
+                    <div class="col-4"><button class="btn btn-alpha" onclick="setDiagnosticMode('S', 'S_CODE')">S</button></div>
+                </div>
+
+            </div>
+            <!-- ================= MAIN KEYBOARD BUTTONS END ================= -->
+
         </div>
     </div>
 
     <script>
+        // Button click hone par field me code bharne ke liye function
+        function setDiagnosticMode(logType, sampleCode) {
+            document.getElementById('panicInput').value = sampleCode;
+            decodePanic();
+        }
+
+        // Core API Call function
         function decodePanic() {
             let code = document.getElementById('panicInput').value.trim().toUpperCase();
             let resultDiv = document.getElementById('panicResult');
             
-            if(!code) return alert("Pehle koi code enter karo!");
+            if(!code) return alert("Pehle koi code enter ya select karo!");
+
+            resultDiv.classList.remove('d-none');
+            resultDiv.innerHTML = `<div class="text-center"><span class="spinner-border spinner-border-sm text-info"></span> Decoding...</div>`;
 
             fetch('/decode', {
                 method: 'POST',
@@ -115,20 +167,18 @@
             })
             .then(response => response.json())
             .then(result => {
-                resultDiv.classList.remove('hidden');
                 if(result.status === "success") {
                     let imgTag = "";
                     if(result.data.image) {
-                        imgTag = `<br><img src="/${result.data.image}" class="solution-img" alt="Solution Diagram">`;
+                        imgTag = `<br><img src="/${result.data.image}" class="solution-img" alt="Solution">`;
                     }
-                    resultDiv.innerHTML = `<strong>Culprit Component:</strong> ${result.data.culprit}<br><strong>Solution:</strong> ${result.data.solution}${imgTag}`;
+                    resultDiv.innerHTML = `<strong>Culprit Line:</strong> <span class="text-danger">${result.data.culprit}</span><br><strong>Solution:</strong> ${result.data.solution}${imgTag}`;
                 } else {
-                    resultDiv.innerHTML = `<strong>Result:</strong> ${result.message}`;
+                    resultDiv.innerHTML = `<span class="text-warning"><i class="fa-solid fa-triangle-exclamation"></i> ${result.message}</span>`;
                 }
             })
             .catch(error => {
-                resultDiv.classList.remove('hidden');
-                resultDiv.innerHTML = "Server se connect nahi ho pa raha hai!";
+                resultDiv.innerHTML = `<span class="text-danger">Server Connect Error!</span>`;
             });
         }
     </script>
