@@ -7,8 +7,8 @@ import google.generativeai as genai
 
 app = Flask(__name__, template_folder='.', static_folder='.', static_url_path='')
 
-# Aapki API Key yahan set hai
-GEMINI_API_KEY = "AQ.Ab8RN6KnMZFyEQay_iLz4NYjRT6969mOfQC0SwX_ZEcxYEAyqA"
+# Majboot Steel Method: Seedhe Render se automatic chabi uthayega
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
 # JSON file se data load karne ka function
