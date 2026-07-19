@@ -1,8 +1,15 @@
-from flask import Flask, render_template, request, jsonify
-import json  # Python ka built-in json library
 import os
+import io
+import json
+from flask import Flask, render_template, request, jsonify
+from PIL import Image
+import google.generativeai as genai
 
 app = Flask(__name__, template_folder='.', static_folder='.', static_url_path='')
+
+# Aapki API Key yahan set hai
+GEMINI_API_KEY = "AQ.Ab8RN6KnMZFyEQay_iLz4NYjRT6969mOfQC0SwX_ZEcxYEAyqA"
+genai.configure(api_key=GEMINI_API_KEY)
 
 # JSON file se data load karne ka function
 def load_database():
@@ -20,14 +27,45 @@ def home():
 def decode():
     data = request.json
     code = data.get('code', '').strip().upper()
-    
-    # Har request par naya data load hoga taaki file me badlav turant dikhe
     panic_database = load_database()
-    
     if code in panic_database:
         return jsonify({"status": "success", "data": panic_database[code]})
     else:
         return jsonify({"status": "error", "message": "Yeh code abhi database me nahi hai!"})
 
+# AI PHOTO SCANNING ROUTE
+@app.route('/scan-panic', methods=['POST'])
+def scan_panic():
+    if 'panic_image' not in request.files:
+        return jsonify({'success': False, 'error': 'Koi photo select nahi ki gayi'}), 400
+        
+    file = request.files['panic_image']
+    if file.filename == '':
+        return jsonify({'success': False, 'error': 'File name khali hai'}), 400
+
+    try:
+        image_bytes = file.read()
+        image = Image.open(io.BytesIO(image_bytes))
+
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        prompt = """
+        You are an expert iPhone motherboard repair technician. Analyze this panic log image carefully.
+        Look closely at the 'panicString', 'SMC PANIC - ASSERT', 'DCP PANIC', 'AOP PANIC', 
+        or hex codes (like 0x40000, 0x80000), or sensor names (like TB0T, TG0B, mic1, mic2, Prs0, AppleSPMIController).
+        
+        Extract ONLY the primary error code, hex string, or sensor name that identifies the hardware fault.
+        Return ONLY the extracted code string itself (e.g., '0X80000' or 'TG0B' or 'DCP PANIC' or 'AppleSPMIController').
+        Do not write full sentences, do not include markdown, just return the raw text of the code.
+        """
+
+        response = model.generate_content([prompt, image])
+        extracted_code = response.text.strip()
+
+        return jsonify({'success': True, 'code': extracted_code})
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True)
