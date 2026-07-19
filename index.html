@@ -51,7 +51,6 @@
     overflow-x:hidden;
   }
 
-  /* faint circuit-trace backdrop */
   body::before{
     content:"";
     position:fixed;
@@ -67,7 +66,6 @@
 
   .container{ max-width:640px; margin:0 auto; position:relative; }
 
-  /* ---------- Header ---------- */
   .console-top{
     display:flex; align-items:center; justify-content:space-between;
     padding:2px 4px 14px;
@@ -132,7 +130,6 @@
   .stat-chip.cyan .n{ color:var(--cyan); }
   .stat-chip.violet .n{ color:var(--violet); }
 
-  /* ---------- Card ---------- */
   .box{
     background:var(--panel);
     border:1px solid var(--line);
@@ -147,8 +144,7 @@
   }
   .section-label .rule{ height:1px; flex:1; background:var(--line); }
 
-  /* ---------- Search ---------- */
-  .search-box{ display:flex; gap:10px; margin-bottom:22px; }
+  .search-box{ display:flex; gap:10px; margin-bottom:12px; }
   input[type="text"]{
     flex:1; padding:14px 16px; border-radius:12px;
     border:1px solid var(--line); background:var(--void-2); color:var(--text);
@@ -172,7 +168,20 @@
     outline:2px solid var(--cyan); outline-offset:2px;
   }
 
-  /* ---------- Category tiles ---------- */
+  /* Naya Upload Section Style */
+  .upload-container {
+    margin-top: 10px; margin-bottom: 22px; border: 1px dashed var(--line); 
+    padding: 16px; border-radius: 14px; text-align: center; background: var(--void-2);
+  }
+  .upload-btn {
+    background: linear-gradient(180deg, #2a3550, #1c2536); color: var(--cyan); 
+    border: 1px solid var(--line); padding: 10px 20px; border-radius: 10px; 
+    cursor: pointer; font-family: var(--mono); font-size: 13px; font-weight: 600; 
+    transition: transform 0.1s, border-color 0.15s;
+  }
+  .upload-btn:hover { border-color: var(--cyan); transform: translateY(-1px); }
+  #uploadStatus { margin-top: 10px; font-family: var(--mono); font-size: 12px; min-height: 18px; }
+
   .grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:10px; }
 
   .tile{
@@ -205,7 +214,6 @@
   .tile.cat-aop{ border-left:3px solid var(--violet); }
   .tile.cat-aop .tile-glyph{ color:var(--violet); }
 
-  /* alphabet grid */
   #alphabetGrid{
     grid-template-columns:repeat(6, 1fr);
     margin-top:4px;
@@ -216,7 +224,6 @@
   }
   #alphabetGrid .tile:hover{ border-top-color:var(--cyan); color:var(--cyan); }
 
-  /* ---------- List / results ---------- */
   #listBox{ margin-top:16px; display:none; }
   #listBox.show{ display:block; }
   .count{
@@ -241,7 +248,6 @@
     border:1px solid var(--line); color:var(--text-faint);
   }
 
-  /* ---------- Detail panel ---------- */
   #result{
     margin-top:16px; padding:0; background:transparent;
     border:none; display:none;
@@ -312,10 +318,20 @@
   </header>
 
   <div class="box">
-    <p class="section-label">Search<span class="rule"></span></p>
+    <p class="section-label">Search Option 1: Manual Input<span class="rule"></span></p>
     <div class="search-box">
       <input type="text" id="searchInput" placeholder="Panic code ya keyword likhein..." onkeyup="if(event.key==='Enter')searchCode()">
       <button class="search-btn" onclick="searchCode()" aria-label="Search">⌕</button>
+    </div>
+
+    <!-- AI PHOTO SCANNING UI HTML -->
+    <p class="section-label">Search Option 2: AI Photo Scan<span class="rule"></span></p>
+    <div class="upload-container">
+      <input type="file" id="panicImageInput" accept="image/*" style="display: none;" onchange="uploadAndAnalyzeImage()">
+      <button type="button" class="upload-btn" onclick="document.getElementById('panicImageInput').click()">
+        📷 Upload Panic Log Screenshot
+      </button>
+      <div id="uploadStatus"></div>
     </div>
 
     <p class="section-label">Categories<span class="rule"></span></p>
@@ -328,7 +344,7 @@
     <div id="result"></div>
   </div>
 
-  <footer>PANIC/DX — offline lookup · no data leaves this page</footer>
+  <footer>PANIC/DX — AI powered lookup · no data leaves this page</footer>
 </div>
 
 <script>
@@ -416,7 +432,7 @@ const panicData = [
 {code:"SMC DATA ABORT",category:"SMC PANIC",cause:"Abnormal CPU Communication"},
 {code:"Stacks+routined-(2019 01 29)",category:"SMC PANIC",cause:"iPad - usually caused by battery screw post being too long (Special iPad)"},
 {code:"sks request timeout",category:"SMC PANIC",cause:"CPU to logic code fragment line / EEPROM"},
-{code:"Sleep/wake hang detected",category:"SMC PANIC",cause:"Battery, Audio CPU powered"},
+{code:"Sleep/wake hang deleted",category:"SMC PANIC",cause:"Battery, Audio CPU powered"},
 {code:"SEP panic::daio/i2c",category:"SMC PANIC",cause:"Down antenna problem"},
 {code:"SMC PANIC",category:"SMC PANIC",cause:"CPU power supply - check inductance"},
 {code:"Spmi timeout",category:"SMC PANIC",cause:"Audio related"},
@@ -676,6 +692,54 @@ function showByCategory(cat) {
 function showByLetter(letter) {
     const found = panicData.filter(item => item.code.trim().toUpperCase().startsWith(letter));
     showList(found);
+}
+
+// AI PHOTO ANALYSIS JAVASCRIPT
+async function uploadAndAnalyzeImage() {
+    const fileInput = document.getElementById('panicImageInput');
+    const statusBox = document.getElementById('uploadStatus');
+    const file = fileInput.files[0];
+    
+    if (!file) return;
+
+    statusBox.innerHTML = `<span style="color: var(--amber);">⏳ AI Photo Scan kar raha hai... Please wait...</span>`;
+    
+    const formData = new FormData();
+    formData.append('panic_image', file);
+
+    try {
+        const response = await fetch('/scan-panic', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success && result.code) {
+            statusBox.innerHTML = `<span style="color: var(--cyan);">✓ Code Mil Gaya: <b>${result.code}</b></span>`;
+            document.getElementById('searchInput').value = result.code;
+            
+            searchCodeFromAI(result.code);
+        } else {
+            statusBox.innerHTML = `<span style="color: var(--danger);">❌ Error: ${result.error || 'Log sahi se padha nahi gaya.'}</span>`;
+        }
+    } catch (error) {
+        statusBox.innerHTML = `<span style="color: var(--danger);">❌ Server se response nahi mila.</span>`;
+        console.error(error);
+    }
+}
+
+function searchCodeFromAI(aiCode) {
+    const val = aiCode.toUpperCase().trim();
+    hideDetail();
+    
+    const found = panicData.filter(item => {
+        const codeUpper = item.code.toUpperCase();
+        const causeUpper = item.cause.toUpperCase();
+        return val.includes(codeUpper) || codeUpper.includes(val) || causeUpper.includes(val);
+    });
+    
+    showList(found, `AI ne photo se code <b>"${aiCode}"</b> dhoonda, par aapke database array mein iska exact hardware matching filhaal nahi mila.`);
 }
 </script>
 </body>
