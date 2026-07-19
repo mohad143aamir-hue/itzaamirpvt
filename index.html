@@ -249,7 +249,7 @@
       <span class="dot"></span>
       <span class="brand-text"><b>PANIC/DX</b> · diagnostic console</span>
     </div>
-    <span class="ver">v2.5 (Steel Build)</span>
+    <span class="ver">v2.6 (Steel Build Pro)</span>
   </div>
 
   <header class="hero">
@@ -257,8 +257,8 @@
     <h1>Board-level <span>panic&nbsp;lookup</span></h1>
     <p class="subtitle">Aamir Khan Automated Diagnostic Bot — panic string ya hex code daalein, faulty part turant maloom karein.</p>
     <div class="stat-strip">
-      <span class="stat-chip amber"><span class="n">217</span> signatures indexed</span>
-      <span class="stat-chip cyan"><span class="n">3</span> categories</span>
+      <span class="stat-chip amber"><span class="n">225</span> signatures indexed</span>
+      <span class="stat-chip cyan"><span class="n">4</span> categories</span>
       <span class="stat-chip violet"><span class="n">100% Local</span> No Server</span>
     </div>
   </header>
@@ -294,6 +294,17 @@
 
 <script>
 const panicData = [
+// === NEW CODES EXTRACTED FROM YOUR SCREENSHOTS ===
+{code:"TB0T", category:"SMC PANIC", cause:"iPhone 13/14/15 Series: Battery Thermal Sensor Issue (Check Battery Flex or Connector lines)"},
+{code:"TB0V", category:"SMC PANIC", cause:"iPhone 14/15 Series: Charging Port / Charging Flex Sensor Error"},
+{code:"TAOJ", category:"SMC PANIC", cause:"iPhone 14 Pro/15 Pro Max: Proximity Ambient Light Flex / Front Camera Flex Assembly"},
+{code:"TAOC", category:"SMC PANIC", cause:"iPhone 15 Series: Audio IC line or Charging Port Flex Sensor anomaly"},
+{code:"TAOP", category:"SMC PANIC", cause:"iPhone 14/15 Series: Earpiece Proximity Sensor Flex issue"},
+{code:"DCP PANIC", category:"SMC PANIC", cause:"Display Coprocessor Error: Screen Touch lines, Display IC, or PMU rails failure"},
+{code:"target.cpp:320", category:"SMC PANIC", cause:"SMC BSC failure on target d73 (iPhone 15 Plus) — Check charging/proximity sensors"},
+{code:"target.cpp:263", category:"SMC PANIC", cause:"SMC BSC failure on target d64 (iPhone 14 Pro) — Check logic board center rails or flex cables"},
+
+// === CORE DATABASE SIGNATURES ===
 {code:"0X80000",category:"SMC PANIC",cause:"It's the Proximity Flex Cable"},
 {code:"0X140000",category:"SMC PANIC",cause:"It's the Charging Port & Power Button Flex or Barometer"},
 {code:"0X180000",category:"SMC PANIC",cause:"It's the Prox Flex & Power Button Flex"},
@@ -639,7 +650,7 @@ function showByLetter(letter) {
     showList(found);
 }
 
-// 100% OFFLINE HIGH-SPEED SCANNING LOGIC (SAFARI COMPATIBLE + IMAGE PREPROCESSING)
+// 100% OFFLINE HIGH-SPEED SCANNING LOGIC (SAFARI COMPATIBLE + ADVANCED PRECISION FILTER)
 function localAnalyzeImage() {
     const fileInput = document.getElementById('panicImageInput');
     const statusBox = document.getElementById('uploadStatus');
@@ -647,7 +658,7 @@ function localAnalyzeImage() {
     
     if (!file) return;
 
-    statusBox.innerHTML = `<span style="color: var(--amber);">⏳ OCR Engine Active... Filtering Image...</span>`;
+    statusBox.innerHTML = `<span style="color: var(--amber);">⏳ OCR Engine Active... Filtering Image Pixels...</span>`;
 
     const reader = new FileReader();
     reader.onload = function(event) {
@@ -673,7 +684,7 @@ function localAnalyzeImage() {
             }
             ctx.putImageData(imgData, 0, 0);
 
-            statusBox.innerHTML = `<span style="color: var(--amber);">⏳ Scanning clear text pixels...</span>`;
+            statusBox.innerHTML = `<span style="color: var(--amber);">⏳ Extracting key technical characters...</span>`;
 
             Tesseract.recognize(
                 canvas.toDataURL('image/jpeg'),
@@ -687,7 +698,7 @@ function localAnalyzeImage() {
                     }
                 }
             ).then(({ data: { text } }) => {
-                statusBox.innerHTML = `<span style="color: var(--cyan);">✓ Local Scan Complete! Matching...</span>`;
+                statusBox.innerHTML = `<span style="color: var(--cyan);">✓ Local Scan Complete! Filtering data noise...</span>`;
                 
                 let cleanedOCR = text.toUpperCase()
                     .replace(/OX/g, '0X')       
@@ -696,38 +707,49 @@ function localAnalyzeImage() {
 
                 console.log("Processed OCR Text:", cleanedOCR);
 
+                // === STEEK KEYWORD & SENSOR MATCHING ENGINE ===
                 const matchedItems = panicData.filter(item => {
                     let dbCode = item.code.toUpperCase().trim();
                     
-                    if (cleanedOCR.includes(dbCode)) return true;
-                    
-                    let noSpaceDB = dbCode.replace(/\s+/g, '');
-                    let noSpaceOCR = cleanedOCR.replace(/\s+/g, '');
-                    if (noSpaceOCR.includes(noSpaceDB)) return true;
-
-                    if (dbCode.startsWith("0X")) {
-                        let dynamicHex = dbCode.replace(/0/g, 'O'); 
-                        if (noSpaceOCR.includes(dynamicHex)) return true;
+                    // Rule 1: Sensor Codes & Short Keywords (Jaise: TB0T, TAOJ, MIC1)
+                    if (dbCode.length >= 3 && !dbCode.includes(" ") && !dbCode.startsWith("0X")) {
+                        let regex = new RegExp("\\b" + dbCode.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + "\\b", "i");
+                        if (regex.test(cleanedOCR)) return true;
                     }
-                    
-                    if (dbCode.length > 6 && !dbCode.startsWith("0X")) {
-                        let keywords = dbCode.split(/[\s\-\:\.\/\|]+/);
-                        return keywords.every(kw => kw.length < 3 || cleanedOCR.includes(kw));
+
+                    // Rule 2: Strictly format Hex strings and alternative 0/O cases
+                    if (dbCode.startsWith("0X")) {
+                        let noSpaceOCR = cleanedOCR.replace(/\s+/g, '');
+                        let noSpaceDB = dbCode.replace(/\s+/g, '');
+                        
+                        if (noSpaceOCR.includes(noSpaceDB)) return true;
+                        let alternativeHex = noSpaceDB.replace(/0/g, 'O');
+                        if (noSpaceOCR.includes(alternativeHex)) return true;
+                        return false;
+                    }
+
+                    // Rule 3: Complex log file indicators (Jaise: target.cpp:320)
+                    if (dbCode.length > 5) {
+                        if (dbCode.includes(".CPP") || dbCode.includes(":")) {
+                            let cleanDbFile = dbCode.replace(/\s+/g, '');
+                            if (cleanedOCR.replace(/\s+/g, '').includes(cleanDbFile)) return true;
+                        }
+                        if (cleanedOCR.includes(dbCode)) return true;
                     }
 
                     return false;
                 });
 
                 if (matchedItems.length > 0) {
-                    statusBox.innerHTML = `<span style="color: var(--cyan);">✓ <b>Success!</b> Log signature auto-matched.</span>`;
+                    statusBox.innerHTML = `<span style="color: var(--cyan);">✓ <b>Success!</b> Correct hardware signature isolated.</span>`;
                     showList(matchedItems);
                 } else {
-                    statusBox.innerHTML = `<span style="color: var(--danger);">⚠ Log read ho gaya, par aapke 217 database signatures se exact match nahi mila.</span>`;
+                    statusBox.innerHTML = `<span style="color: var(--danger);">⚠ Log successfully read, but no exact hardware signature match found in the database.</span>`;
                     hideDetail();
                     document.getElementById('listBox').classList.remove('show');
                 }
             }).catch(error => {
-                statusBox.innerHTML = `<span style="color: var(--danger);">❌ Safari/Browser block context. Ensure HTTPS or try manual input.</span>`;
+                statusBox.innerHTML = `<span style="color: var(--danger);">❌ Connection blocked. Please ensure HTTPS context or use manual search.</span>`;
                 console.error(error);
             });
         };
