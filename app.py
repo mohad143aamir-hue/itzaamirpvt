@@ -7,7 +7,7 @@ import google.generativeai as genai
 
 app = Flask(__name__, template_folder='.', static_folder='.', static_url_path='')
 
-# Majboot Steel Method: Seedhe Render se automatic chabi uthayega
+# Render se automatic chabi uthane ka system
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
@@ -33,7 +33,7 @@ def decode():
     else:
         return jsonify({"status": "error", "message": "Yeh code abhi database me nahi hai!"})
 
-# AI PHOTO SCANNING ROUTE
+# UPGRADED BULLETPROOF AI ROUTE
 @app.route('/scan-panic', methods=['POST'])
 def scan_panic():
     if 'panic_image' not in request.files:
@@ -47,8 +47,6 @@ def scan_panic():
         image_bytes = file.read()
         image = Image.open(io.BytesIO(image_bytes))
 
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        
         prompt = """
         You are an expert iPhone motherboard repair technician. Analyze this panic log image carefully.
         Look closely at the 'panicString', 'SMC PANIC - ASSERT', 'DCP PANIC', 'AOP PANIC', 
@@ -59,9 +57,25 @@ def scan_panic():
         Do not write full sentences, do not include markdown, just return the raw text of the code.
         """
 
-        response = model.generate_content([prompt, image])
-        extracted_code = response.text.strip()
+        # MAJBOOT STEEL LOOP: Agar ek naam par 404 aayega, toh agla automatic try hoga!
+        model_variants = ['gemini-1.5-flash-latest', 'gemini-1.5-flash', 'gemini-2.5-flash']
+        response = None
+        last_error = ""
 
+        for model_name in model_variants:
+            try:
+                model = genai.GenerativeModel(model_name)
+                response = model.generate_content([prompt, image])
+                if response and response.text:
+                    break # Agar response mil gaya toh loop se bahar nikal jayega
+            except Exception as e:
+                last_error = str(e)
+                continue
+
+        if not response:
+            return jsonify({'success': False, 'error': f"AI Connection Error: {last_error}"}), 500
+
+        extracted_code = response.text.strip()
         return jsonify({'success': True, 'code': extracted_code})
 
     except Exception as e:
