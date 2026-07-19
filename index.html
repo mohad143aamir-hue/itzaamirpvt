@@ -61,6 +61,8 @@
       linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
     background-size: 42px 42px;
     opacity:.16;
+    /* SAFARI FIX: Dono mask prefixes zaruri hain */
+    -webkit-mask-image: radial-gradient(700px 700px at 50% 0%, black, transparent 75%);
     mask-image: radial-gradient(700px 700px at 50% 0%, black, transparent 75%);
   }
 
@@ -165,7 +167,6 @@
   button.search-btn:hover{ border-color:var(--cyan); transform:translateY(-1px); }
   button.search-btn:active{ transform:translateY(0); }
 
-  /* Bulletproof Local OCR UI Style */
   .upload-container {
     margin-top: 10px; margin-bottom: 22px; border: 1px dashed var(--line); 
     padding: 20px; border-radius: 14px; text-align: center; background: var(--void-2);
@@ -238,7 +239,6 @@
 
   footer{ text-align:center; margin-top:22px; color:var(--text-faint); font-family:var(--mono); font-size:10.5px; }
 </style>
-<!-- SUPER INTEL CORE HIGH-SPEED LOCAL OCR ENGINE -->
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
@@ -270,7 +270,6 @@
       <button class="search-btn" onclick="searchCode()" aria-label="Search">⌕</button>
     </div>
 
-    <!-- BULLETPROOF INTERNAL OCR BUTTON -->
     <p class="section-label">Search Option 2: High-Speed Local Photo Scan<span class="rule"></span></p>
     <div class="upload-container">
       <input type="file" id="panicImageInput" accept="image/*" style="display: none;" onchange="localAnalyzeImage()">
@@ -413,7 +412,7 @@ const panicData = [
 {code:"0X600000",category:"SMC PANIC",cause:"Wireless charging flex & proximity flex"},
 {code:"0X100000",category:"SMC PANIC",cause:"Power Button Flex / Charging Port Flex"},
 {code:"0X200000",category:"SMC PANIC",cause:"Proximity Flex Cable"},
-{code:"0X300000",category:"SMC PANIC",cause:"Proximity Flex Cable / camera issue (autofocus, image stabilization)"},
+{code:"0X300000",category:"Proximity Flex Cable / camera issue (autofocus, image stabilization)"},
 {code:"TT1P TT2P",category:"SMC PANIC",cause:"Screen"},
 {code:"TG0B",category:"SMC PANIC",cause:"Battery - No Data"},
 {code:"TG0V TTSA",category:"SMC PANIC",cause:"Charging Port Flex"},
@@ -640,7 +639,7 @@ function showByLetter(letter) {
     showList(found);
 }
 
-// 100% OFFLINE HIGH-SPEED SCANNING LOGIC (NO SERVER REQUIRED)
+// 100% OFFLINE HIGH-SPEED SCANNING LOGIC (SAFARI COMPATIBLE + IMAGE PREPROCESSING)
 function localAnalyzeImage() {
     const fileInput = document.getElementById('panicImageInput');
     const statusBox = document.getElementById('uploadStatus');
@@ -648,50 +647,93 @@ function localAnalyzeImage() {
     
     if (!file) return;
 
-    statusBox.innerHTML = `<span style="color: var(--amber);">⏳ OCR Engine Active... Initializing local scan...</span>`;
+    statusBox.innerHTML = `<span style="color: var(--amber);">⏳ OCR Engine Active... Filtering Image...</span>`;
 
-    Tesseract.recognize(
-        file,
-        'eng',
-        { logger: m => {
-            if(m.status === 'recognizing-text') {
-                let progress = Math.round(m.progress * 100);
-                statusBox.innerHTML = `<span style="color: var(--amber);">⏳ Scanning image... <b>${progress}% Done</b></span>`;
-            }
-        }}
-    ).then(({ data: { text } }) => {
-        statusBox.innerHTML = `<span style="color: var(--cyan);">✓ Local Scan Complete! Matching with database signatures...</span>`;
-        
-        const extractedTextUpper = text.toUpperCase().replace(/\s+/g, '');
-        console.log("Extracted Cleaned Text:", extractedTextUpper);
-
-        // Advanced local text string match algorithm
-        const matchedItems = panicData.filter(item => {
-            const cleanCode = item.code.toUpperCase().replace(/\s+/g, '');
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
             
-            // Core condition: Check if log contains the code string
-            if (extractedTextUpper.includes(cleanCode)) return true;
+            const maxW = 900;
+            canvas.width = maxW;
+            canvas.height = (img.height / img.width) * maxW;
             
-            // Check for potential hex formats (0x80000 -> 0X80000)
-            if (cleanCode.startsWith("0X")) {
-                let formatAlt = cleanCode.replace("0X", "0X");
-                if (extractedTextUpper.includes(formatAlt)) return true;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imgData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                let brightness = 0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2];
+                let v = (brightness > 125) ? 255 : 0; 
+                data[i] = v;     
+                data[i + 1] = v; 
+                data[i + 2] = v; 
             }
-            return false;
-        });
+            ctx.putImageData(imgData, 0, 0);
 
-        if (matchedItems.length > 0) {
-            statusBox.innerHTML = `<span style="color: var(--cyan);">✓ <b>Success!</b> Log signature auto-matched.</span>`;
-            showList(matchedItems);
-        } else {
-            statusBox.innerHTML = `<span style="color: var(--danger);">⚠ Image text read ho gaya, par aapke 217 database signatures se exact match nahi mila. Ek baar manually try karein.</span>`;
-            hideDetail();
-            document.getElementById('listBox').classList.remove('show');
-        }
-    }).catch(error => {
-        statusBox.innerHTML = `<span style="color: var(--danger);">❌ Image parsing failed. Photo ko thoda clear karke dobara upload karein.</span>`;
-        console.error(error);
-    });
+            statusBox.innerHTML = `<span style="color: var(--amber);">⏳ Scanning clear text pixels...</span>`;
+
+            Tesseract.recognize(
+                canvas.toDataURL('image/jpeg'),
+                'eng',
+                { 
+                    logger: m => {
+                        if(m.status === 'recognizing-text') {
+                            let progress = Math.round(m.progress * 100);
+                            statusBox.innerHTML = `<span style="color: var(--amber);">⏳ Scanning image... <b>${progress}% Done</b></span>`;
+                        }
+                    }
+                }
+            ).then(({ data: { text } }) => {
+                statusBox.innerHTML = `<span style="color: var(--cyan);">✓ Local Scan Complete! Matching...</span>`;
+                
+                let cleanedOCR = text.toUpperCase()
+                    .replace(/OX/g, '0X')       
+                    .replace(/O([0-9])/g, '0$1') 
+                    .replace(/([0-9])O/g, '$10');
+
+                console.log("Processed OCR Text:", cleanedOCR);
+
+                const matchedItems = panicData.filter(item => {
+                    let dbCode = item.code.toUpperCase().trim();
+                    
+                    if (cleanedOCR.includes(dbCode)) return true;
+                    
+                    let noSpaceDB = dbCode.replace(/\s+/g, '');
+                    let noSpaceOCR = cleanedOCR.replace(/\s+/g, '');
+                    if (noSpaceOCR.includes(noSpaceDB)) return true;
+
+                    if (dbCode.startsWith("0X")) {
+                        let dynamicHex = dbCode.replace(/0/g, 'O'); 
+                        if (noSpaceOCR.includes(dynamicHex)) return true;
+                    }
+                    
+                    if (dbCode.length > 6 && !dbCode.startsWith("0X")) {
+                        let keywords = dbCode.split(/[\s\-\:\.\/\|]+/);
+                        return keywords.every(kw => kw.length < 3 || cleanedOCR.includes(kw));
+                    }
+
+                    return false;
+                });
+
+                if (matchedItems.length > 0) {
+                    statusBox.innerHTML = `<span style="color: var(--cyan);">✓ <b>Success!</b> Log signature auto-matched.</span>`;
+                    showList(matchedItems);
+                } else {
+                    statusBox.innerHTML = `<span style="color: var(--danger);">⚠ Log read ho gaya, par aapke 217 database signatures se exact match nahi mila.</span>`;
+                    hideDetail();
+                    document.getElementById('listBox').classList.remove('show');
+                }
+            }).catch(error => {
+                statusBox.innerHTML = `<span style="color: var(--danger);">❌ Safari/Browser block context. Ensure HTTPS or try manual input.</span>`;
+                console.error(error);
+            });
+        };
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
 }
 </script>
 </body>
