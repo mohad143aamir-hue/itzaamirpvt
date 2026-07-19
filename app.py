@@ -3,13 +3,12 @@ import io
 import json
 from flask import Flask, render_template, request, jsonify
 from PIL import Image
-import google.generativeai as genai
+from google import genai
 
 app = Flask(__name__, template_folder='.', static_folder='.', static_url_path='')
 
-# Render se automatic chabi uthane ka system
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-genai.configure(api_key=GEMINI_API_KEY)
+# New 2026 SDK Method: Yeh automatic Render ke Environment Variable se chabi utha lega
+client = genai.Client()
 
 # JSON file se data load karne ka function
 def load_database():
@@ -33,7 +32,7 @@ def decode():
     else:
         return jsonify({"status": "error", "message": "Yeh code abhi database me nahi hai!"})
 
-# UPGRADED BULLETPROOF AI ROUTE
+# NEW UPDATED AI ROUTE
 @app.route('/scan-panic', methods=['POST'])
 def scan_panic():
     if 'panic_image' not in request.files:
@@ -57,23 +56,14 @@ def scan_panic():
         Do not write full sentences, do not include markdown, just return the raw text of the code.
         """
 
-        # MAJBOOT STEEL LOOP: Agar ek naam par 404 aayega, toh agla automatic try hoga!
-        model_variants = ['gemini-1.5-flash-latest', 'gemini-1.5-flash', 'gemini-2.5-flash']
-        response = None
-        last_error = ""
+        # New stable model execution
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=[image, prompt]
+        )
 
-        for model_name in model_variants:
-            try:
-                model = genai.GenerativeModel(model_name)
-                response = model.generate_content([prompt, image])
-                if response and response.text:
-                    break # Agar response mil gaya toh loop se bahar nikal jayega
-            except Exception as e:
-                last_error = str(e)
-                continue
-
-        if not response:
-            return jsonify({'success': False, 'error': f"AI Connection Error: {last_error}"}), 500
+        if not response or not response.text:
+            return jsonify({'success': False, 'error': "AI response khali mila."}), 500
 
         extracted_code = response.text.strip()
         return jsonify({'success': True, 'code': extracted_code})
