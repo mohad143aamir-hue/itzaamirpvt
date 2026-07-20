@@ -172,6 +172,84 @@
     outline:2px solid var(--cyan); outline-offset:2px;
   }
 
+  /* ---------- Photo upload ---------- */
+  .upload-section{ margin-bottom:18px; }
+  .upload-btn{
+    width:100%; display:flex; align-items:center; justify-content:center; gap:10px;
+    background:linear-gradient(135deg, #1c2536, #161f2d);
+    border:1px dashed var(--line);
+    color:var(--text); padding:16px; border-radius:14px;
+    font-family:var(--sans); font-weight:700; font-size:14px;
+    cursor:pointer; transition:border-color .15s, transform .12s, background .15s;
+  }
+  .upload-btn:hover{ border-color:var(--amber); transform:translateY(-1px); background:var(--panel-3); }
+  .upload-btn .icon{
+    width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center;
+    color:var(--amber); font-size:16px;
+  }
+  .upload-hint{ text-align:center; font-family:var(--mono); font-size:10.5px; color:var(--text-faint); margin:8px 0 0; }
+
+  .photo-preview{
+    display:none; align-items:center; gap:10px; margin-top:10px;
+    background:var(--void-2); border:1px solid var(--line); border-radius:12px; padding:8px;
+  }
+  .photo-preview.show{ display:flex; }
+  .photo-preview img{
+    width:52px; height:52px; object-fit:cover; border-radius:8px; border:1px solid var(--line);
+  }
+  .photo-preview .pv-name{ font-family:var(--mono); font-size:11px; color:var(--text-dim); flex:1; word-break:break-all; }
+  .photo-preview .pv-clear{
+    background:none; border:none; color:var(--text-faint); font-size:16px; cursor:pointer; padding:4px 8px;
+  }
+
+  /* ---------- Processing indicator ---------- */
+  #answerArea{ margin-top:4px; }
+  .processing{
+    display:flex; align-items:center; gap:10px;
+    background:var(--void-2); border:1px solid var(--line); border-radius:12px;
+    padding:13px 15px; margin-top:12px;
+    font-family:var(--mono); font-size:12.5px; color:var(--text-dim);
+  }
+  .spinner{
+    width:15px; height:15px; border-radius:50%;
+    border:2px solid var(--line); border-top-color:var(--amber);
+    animation: spin .7s linear infinite; flex:none;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  /* ---------- Photo answer card ---------- */
+  .answer-card{
+    margin-top:12px;
+    background:linear-gradient(180deg, var(--panel-2), var(--panel));
+    border:1px solid var(--amber);
+    border-radius:16px; padding:18px; position:relative; overflow:hidden;
+  }
+  .answer-card::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:4px;
+    background:linear-gradient(180deg, var(--amber), var(--cyan));
+  }
+  .answer-card .dx-label{
+    font-family:var(--mono); font-size:10.5px; color:var(--amber);
+    letter-spacing:.14em; text-transform:uppercase; margin-bottom:6px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .confidence-pill{
+    font-family:var(--mono); font-size:10px; padding:2px 8px; border-radius:999px;
+    border:1px solid var(--line); color:var(--text-dim); text-transform:none; letter-spacing:0;
+  }
+  .confidence-pill.high{ border-color:var(--cyan); color:var(--cyan); }
+  .confidence-pill.low{ border-color:var(--rose); color:var(--rose); }
+  .answer-card h3{
+    font-family:var(--mono); font-size:19px; margin:0 0 12px; font-weight:700; word-break:break-word;
+  }
+  .answer-fallback{
+    margin-top:12px; padding:13px 15px; border-radius:12px;
+    background:var(--void-2); border:1px solid var(--rose);
+    font-size:13px; color:var(--text-dim); line-height:1.6;
+  }
+  .answer-fallback b{ color:var(--rose); }
+  .candidate-list{ margin-top:10px; }
+
   /* ---------- Category tiles ---------- */
   .grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:10px; }
 
@@ -297,13 +375,13 @@
       <span class="dot"></span>
       <span class="brand-text"><b>PANIC/DX</b> · diagnostic console</span>
     </div>
-    <span class="ver">v2.0</span>
+    <span class="ver">v3.0</span>
   </div>
 
   <header class="hero">
     <p class="eyebrow">AI PANIC SOLUTION<span class="rule"></span></p>
     <h1>Board-level <span>panic&nbsp;lookup</span></h1>
-    <p class="subtitle">Aamir Khan Automated Diagnostic Bot — panic string ya hex code daalein, faulty part turant maloom karein.</p>
+    <p class="subtitle">Aamir Khan Automated Diagnostic Bot — panic string/code type karein, ya panic screen ki photo upload karein (kaisi bhi ho), AI turant padh ke faulty part bata dega.</p>
     <div class="stat-strip">
       <span class="stat-chip amber"><span class="n">217</span> signatures indexed</span>
       <span class="stat-chip cyan"><span class="n">3</span> categories</span>
@@ -318,17 +396,31 @@
       <button class="search-btn" onclick="searchCode()" aria-label="Search">⌕</button>
     </div>
 
-    <p class="section-label">Categories<span class="rule"></span></p>
+    <div class="upload-section">
+      <button class="upload-btn" onclick="document.getElementById('panicPhotoInput').click()">
+        <span class="icon">📷</span> Upload Your Panic
+      </button>
+      <input type="file" id="panicPhotoInput" accept="image/*" style="display:none" onchange="handlePanicPhoto(event)">
+      <p class="upload-hint">Panic screen ki photo daalein — chahe angle se ho, dhundhli ho, ya andheri — AI khud padh lega</p>
+      <div class="photo-preview" id="photoPreview">
+        <img id="photoPreviewImg" alt="Uploaded panic">
+        <span class="pv-name" id="photoPreviewName"></span>
+        <button class="pv-clear" onclick="clearPhoto()" aria-label="Remove">✕</button>
+      </div>
+    </div>
+
+    <div id="answerArea"></div>
+    <div id="listBox"></div>
+    <div id="result"></div>
+
+    <p class="section-label" style="margin-top:20px;">Categories<span class="rule"></span></p>
     <div class="grid two" id="categoryGrid"></div>
 
     <p class="section-label">Jump by letter<span class="rule"></span></p>
     <div class="grid" id="alphabetGrid"></div>
-
-    <div id="listBox"></div>
-    <div id="result"></div>
   </div>
 
-  <footer>PANIC/DX — offline lookup · no data leaves this page</footer>
+  <footer>PANIC/DX — text search offline · photo analysis AI-powered (secure server)</footer>
 </div>
 
 <script>
@@ -643,29 +735,48 @@ function showDetailByIndex(idx) {
       </div>`;
 }
 
+function showProcessing(text){
+    hideDetail();
+    document.getElementById('listBox').classList.remove('show');
+    const box = document.getElementById('answerArea');
+    box.innerHTML = `<div class="processing"><span class="spinner"></span><span id="processingLabel">${text}</span></div>`;
+}
+function updateProcessing(text){
+    const label = document.getElementById('processingLabel');
+    if (label) label.textContent = text;
+}
+function hideProcessing(){
+    document.getElementById('answerArea').innerHTML = "";
+}
+
 function searchCode() {
     const raw = document.getElementById('searchInput').value.trim();
     const val = raw.toUpperCase();
     if (!val) return alert("Pehle kuch likhein!");
 
-    let hexFromDecimal = null;
-    if (/^[0-9]+$/.test(raw)) {
-        hexFromDecimal = "0X" + parseInt(raw, 10).toString(16).toUpperCase();
-    }
+    showProcessing("Searching database...");
 
-    const found = panicData.filter(item => {
-        const codeUpper = item.code.toUpperCase();
-        const causeUpper = item.cause.toUpperCase();
-        const dec = getDecimal(item.code);
+    setTimeout(() => {
+        let hexFromDecimal = null;
+        if (/^[0-9]+$/.test(raw)) {
+            hexFromDecimal = "0X" + parseInt(raw, 10).toString(16).toUpperCase();
+        }
 
-        if (codeUpper.includes(val)) return true;
-        if (causeUpper.includes(val)) return true;
-        if (dec !== null && String(dec).includes(raw)) return true;
-        if (hexFromDecimal && codeUpper === hexFromDecimal) return true;
+        const found = panicData.filter(item => {
+            const codeUpper = item.code.toUpperCase();
+            const causeUpper = item.cause.toUpperCase();
+            const dec = getDecimal(item.code);
 
-        return false;
-    });
-    showList(found, "Is keyword/code (hex ya decimal) ke liye abhi data add nahi hua hai.");
+            if (codeUpper.includes(val)) return true;
+            if (causeUpper.includes(val)) return true;
+            if (dec !== null && String(dec).includes(raw)) return true;
+            if (hexFromDecimal && codeUpper === hexFromDecimal) return true;
+
+            return false;
+        });
+        hideProcessing();
+        showList(found, "Is keyword/code (hex ya decimal) ke liye abhi data add nahi hua hai.");
+    }, 300);
 }
 
 function showByCategory(cat) {
@@ -677,6 +788,159 @@ function showByLetter(letter) {
     const found = panicData.filter(item => item.code.trim().toUpperCase().startsWith(letter));
     showList(found);
 }
+
+/* ================= PHOTO UPLOAD + AI ANALYSIS (Flask + Gemini backend) ================= */
+
+function clearPhoto(){
+    document.getElementById('photoPreview').classList.remove('show');
+    document.getElementById('panicPhotoInput').value = "";
+    hideProcessing();
+    document.getElementById('answerArea').innerHTML = "";
+}
+
+function handlePanicPhoto(event){
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+    document.getElementById('photoPreviewImg').src = url;
+    document.getElementById('photoPreviewName').textContent = file.name;
+    document.getElementById('photoPreview').classList.add('show');
+
+    document.getElementById('listBox').classList.remove('show');
+    hideDetail();
+    showProcessing("Photo AI ko bheji ja rahi hai...");
+
+    const formData = new FormData();
+    formData.append('panic_image', file);
+
+    fetch('/scan-panic', { method: 'POST', body: formData })
+        .then(res => {
+            if (!res.ok) throw new Error("Server error (" + res.status + ")");
+            return res.json();
+        })
+        .then(data => {
+            if (!data.success) throw new Error(data.error || "AI se jawab nahi mila");
+            updateProcessing("Panic code decode ho raha hai...");
+            setTimeout(() => analyzeOcrText(data.text || ""), 200);
+        })
+        .catch(err => {
+            hideProcessing();
+            renderPhotoFallback([], "", "Photo analyze nahi ho payi (" + err.message + "). Internet check karein ya dubara try karein.");
+        });
+}
+
+/* Precise extraction: reads the actual "S.sensor array ... is X, Y, Z" fault values
+   (same field a technician reads manually) and matches the nonzero value's hex form
+   against the panic database. Falls back to keyword/code substring scanning. */
+function analyzeOcrText(rawText){
+    const text = (rawText || "").replace(/\\\//g, '/');
+    const upper = text.toUpperCase();
+
+    let categoryHint = null;
+    if (/USERSPACE\s+WATCHDOG\s+TIMEOUT/i.test(text) || /MISSING SENSOR/i.test(text)) categoryHint = "WATCHDOG";
+    else if (/AOP\s+PANIC/i.test(text) || /\bSCMTO\b/i.test(text)) categoryHint = "AOP";
+    else if (/SMC\s+PANIC/i.test(text)) categoryHint = "SMC PANIC";
+
+    // 1) Missing sensor (watchdog) pattern
+    const missingMatch = text.match(/Missing sensor\(s\):\s*([A-Za-z0-9]+)/i);
+    if (missingMatch) {
+        const code = missingMatch[1].toUpperCase();
+        const entry = panicData.find(e => e.code.toUpperCase() === code);
+        if (entry) return renderPhotoAnswer(entry, "high", "Missing sensor field se match hua");
+    }
+
+    // 2) SCMto (AOP) direct signature
+    if (/\bSCMTO\b/i.test(text)) {
+        const entry = panicData.find(e => e.code.toUpperCase() === "SCMTO");
+        if (entry) return renderPhotoAnswer(entry, "high", "AOP panic signature se match hua");
+    }
+
+    // 3) Sensor-array fault value (the real diagnostic code technicians read manually)
+    const arrayMatches = [...text.matchAll(/sensor array\s*0\s*-\s*\d+\s*is\s*([0-9xXa-fA-F,\s]+)/gi)];
+    const foundFromArray = [];
+    arrayMatches.forEach(m => {
+        const tokens = m[1].split(',').map(t => t.trim()).filter(Boolean);
+        tokens.forEach(tok => {
+            let val = null;
+            if (/^0x[0-9a-f]+$/i.test(tok)) val = parseInt(tok, 16);
+            else if (/^[0-9]+$/.test(tok)) val = parseInt(tok, 10);
+            if (val && val > 0) {
+                const hex = "0X" + val.toString(16).toUpperCase();
+                const entry = panicData.find(e => e.code.toUpperCase() === hex);
+                if (entry) foundFromArray.push(entry);
+            }
+        });
+    });
+    if (foundFromArray.length === 1) {
+        return renderPhotoAnswer(foundFromArray[0], "high", "Sensor array fault value se decode hua");
+    }
+    if (foundFromArray.length > 1) {
+        return renderPhotoFallback(foundFromArray, text, "Panic mein ek se zyada sensor array value mili — sabse sambhavit ye hain:");
+    }
+
+    // 4) Fallback: scan every known code as a substring inside the AI text, prefer longer/more specific codes
+    const candidates = panicData
+        .filter(item => {
+            const code = item.code.trim();
+            if (code.length < 3) return false; // avoid noisy super-short matches
+            return upper.includes(code.toUpperCase());
+        })
+        .sort((a, b) => b.code.length - a.code.length);
+
+    if (candidates.length) {
+        let pool = candidates;
+        if (categoryHint) {
+            const hinted = candidates.filter(c => c.category === categoryHint);
+            if (hinted.length) pool = hinted;
+        }
+        const top = pool[0];
+        const rest = pool.slice(1, 4);
+        if (rest.length === 0) {
+            return renderPhotoAnswer(top, "medium", "Panic text mein code keyword match hua");
+        }
+        return renderPhotoFallback(pool.slice(0, 4), text, "Photo se exact ek match confirm nahi ho paya — sabse sambhavit options:");
+    }
+
+    // 5) Nothing matched at all
+    renderPhotoFallback([], text, "Is photo mein koi known panic code detect nahi hua. Photo saaf aur seedhi kheenchein, ya neeche search bar mein manually likhein.");
+}
+
+function renderPhotoAnswer(entry, confidence, reason){
+    hideProcessing();
+    const dec = getDecimal(entry.code);
+    const decRow = dec !== null ? `<div class="dx-row"><span class="k">Decimal</span><span class="v mono">${dec}</span></div>` : "";
+    const confClass = confidence === "high" ? "high" : (confidence === "low" ? "low" : "");
+    const box = document.getElementById('answerArea');
+    box.innerHTML = `
+      <div class="answer-card">
+        <div class="dx-label">📷 Photo diagnostic result <span class="confidence-pill ${confClass}">${confidence} confidence</span></div>
+        <h3>${entry.code}</h3>
+        ${decRow}
+        <div class="dx-row"><span class="k">Likely cause</span><span class="v">${entry.cause}</span></div>
+        <div class="dx-row"><span class="k">Category</span><span class="v"><span class="cat-pill">${entry.category}</span></span></div>
+        <div class="dx-row"><span class="k">Matched via</span><span class="v" style="color:var(--text-faint); font-size:12px;">${reason}</span></div>
+      </div>`;
+}
+
+function renderPhotoFallback(candidates, ocrText, message){
+    hideProcessing();
+    const box = document.getElementById('answerArea');
+    let candHtml = "";
+    if (candidates.length) {
+        candHtml = `<div class="candidate-list">` + candidates.map(item => {
+            const dec = getDecimal(item.code);
+            const decLabel = dec !== null ? ` <span style="color:var(--text-faint)">(dec ${dec})</span>` : "";
+            return `<div class="list-item" onclick="renderPhotoAnswer(panicData[${panicData.indexOf(item)}],'medium','Manually confirm kiya gaya')"><b>${item.code}</b>${decLabel} — ${item.cause}<span class="badge">${badgeFor(item.category)}</span></div>`;
+        }).join('') + `</div>`;
+    }
+    box.innerHTML = `
+      <div class="answer-fallback">
+        <b>Confirm nahi ho paya:</b> ${message}
+      </div>
+      ${candHtml}`;
+}
+
 </script>
 </body>
 </html>
