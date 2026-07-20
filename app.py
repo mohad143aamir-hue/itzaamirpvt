@@ -32,12 +32,14 @@ def decode():
     else:
         return jsonify({"status": "error", "message": "Yeh code abhi database me nahi hai!"})
 
-# NEW UPDATED AI ROUTE
+# UPDATED AI ROUTE — ab AI khud "guess" nahi karta, sirf jo bhi text dikh raha hai
+# usko transcribe karta hai. Exact decode index.html mein deterministic logic se hota hai
+# (S.sensor array wali line se — yehi asli code hota hai, AI ke bharose nahi chhodte).
 @app.route('/scan-panic', methods=['POST'])
 def scan_panic():
     if 'panic_image' not in request.files:
         return jsonify({'success': False, 'error': 'Koi photo select nahi ki gayi'}), 400
-        
+
     file = request.files['panic_image']
     if file.filename == '':
         return jsonify({'success': False, 'error': 'File name khali hai'}), 400
@@ -46,15 +48,16 @@ def scan_panic():
         image_bytes = file.read()
         image = Image.open(io.BytesIO(image_bytes))
 
-        prompt = """
-        You are an expert iPhone motherboard repair technician. Analyze this panic log image carefully.
-        Look closely at the 'panicString', 'SMC PANIC - ASSERT', 'DCP PANIC', 'AOP PANIC', 
-        or hex codes (like 0x40000, 0x80000), or sensor names (like TB0T, TG0B, mic1, mic2, Prs0, AppleSPMIController).
-        
-        Extract ONLY the primary error code, hex string, or sensor name that identifies the hardware fault.
-        Return ONLY the extracted code string itself (e.g., '0X80000' or 'TG0B' or 'DCP PANIC' or 'AppleSPMIController').
-        Do not write full sentences, do not include markdown, just return the raw text of the code.
-        """
+        prompt = """Ye ek iPhone panic-log crash report ki photo hai (chahe angle se li ho, dhundhli ho, andheri ho, background mein haath/table dikh raha ho — jo bhi ho).
+
+Tumhara kaam: is photo mein jitna bhi panic/crash text (panicString) visible hai, use BILKUL WAISA HI, jaisa likha hai, transcribe karo. Khaaskar dhyan rakhna in cheezon ka agar dikhein:
+- "S.sensor array 0 - N is ..." wali poori line (numbers exactly jaise likhe hain, comma samet)
+- "F.sensor array ..." line
+- "Missing sensor(s): ..." line
+- "SMC PANIC", "AOP PANIC", "DCP PANIC", "SCMto", "userspace watchdog timeout" jaise keywords
+- koi bhi 0x hex code ya panic identifier
+
+Sirf transcribed text return karo — koi explanation, koi "here is the text", koi markdown formatting nahi. Agar text bilkul illegible/unreadable hai to sirf "UNREADABLE" likhna."""
 
         # New stable model execution
         response = client.models.generate_content(
@@ -65,8 +68,8 @@ def scan_panic():
         if not response or not response.text:
             return jsonify({'success': False, 'error': "AI response khali mila."}), 500
 
-        extracted_code = response.text.strip()
-        return jsonify({'success': True, 'code': extracted_code})
+        extracted_text = response.text.strip()
+        return jsonify({'success': True, 'text': extracted_text})
 
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
