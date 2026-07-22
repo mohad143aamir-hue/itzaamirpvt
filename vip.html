@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIP Dashboard — Aamir Khan AI Panic Solution</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0a0e14; --void-2:#0d131c; --panel:#111925; --panel-2:#161f2d;
+    --line:#243248; --text:#e8eef5; --text-dim:#8fa1b8; --text-faint:#5b6b83;
+    --amber:#ffb454; --cyan:#5eead4;
+    --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; font-family:var(--sans); color:var(--text); padding:18px 14px 40px;
+    background: radial-gradient(1100px 700px at 15% -10%, #142033 0%, transparent 55%), var(--void);
+  }
+  .container{ max-width:640px; margin:0 auto; }
+  .topbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .topbar .who{ font-family:var(--mono); font-size:12.5px; color:var(--text-dim); }
+  .topbar a{ color:var(--text-faint); font-size:12px; text-decoration:none; font-family:var(--mono); }
+  .box{ background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:24px; }
+  .eyebrow{ font-family:var(--mono); font-size:11px; letter-spacing:.16em; color:var(--amber); text-transform:uppercase; margin:0 0 8px; }
+  h1{ font-family:var(--mono); font-size:24px; margin:0 0 6px; }
+  .sub{ color:var(--text-dim); font-size:13.5px; margin:0 0 20px; }
+  .badge{
+    display:inline-flex; gap:8px; align-items:center; font-family:var(--mono); font-size:12px;
+    background:var(--void-2); border:1px solid var(--line); padding:8px 12px; border-radius:999px; margin-bottom:22px;
+  }
+  .badge .n{ color:var(--cyan); font-weight:700; }
+
+  /* ---------- Photo upload ---------- */
+  .upload-btn{
+    width:100%; display:flex; align-items:center; justify-content:center; gap:10px;
+    background:linear-gradient(135deg, #1c2536, #161f2d);
+    border:1px dashed var(--line);
+    color:var(--text); padding:16px; border-radius:14px;
+    font-family:var(--sans); font-weight:700; font-size:14px;
+    cursor:pointer; transition:border-color .15s, transform .12s, background .15s;
+  }
+  .upload-btn:hover{ border-color:var(--amber); transform:translateY(-1px); }
+  .upload-btn .icon{ font-size:16px; }
+  .upload-hint{ text-align:center; font-family:var(--mono); font-size:10.5px; color:var(--text-faint); margin:8px 0 0; }
+
+  .photo-preview{
+    display:none; align-items:center; gap:10px; margin-top:10px;
+    background:var(--void-2); border:1px solid var(--line); border-radius:12px; padding:8px;
+  }
+  .photo-preview.show{ display:flex; }
+  .photo-preview img{ width:52px; height:52px; object-fit:cover; border-radius:8px; border:1px solid var(--line); }
+  .photo-preview .pv-name{ font-family:var(--mono); font-size:11px; color:var(--text-dim); flex:1; word-break:break-all; }
+  .photo-preview .pv-clear{ background:none; border:none; color:var(--text-faint); font-size:16px; cursor:pointer; padding:4px 8px; }
+
+  #answerArea{ margin-top:14px; }
+  .processing{
+    display:flex; align-items:center; gap:10px;
+    background:var(--void-2); border:1px solid var(--line); border-radius:12px;
+    padding:13px 15px; margin-top:12px;
+    font-family:var(--mono); font-size:12.5px; color:var(--text-dim);
+  }
+  .spinner{
+    width:15px; height:15px; border-radius:50%;
+    border:2px solid var(--line); border-top-color:var(--amber);
+    animation: spin .7s linear infinite; flex:none;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .answer-card{
+    margin-top:12px;
+    background:linear-gradient(180deg, var(--panel-2), var(--panel));
+    border:1px solid var(--amber);
+    border-radius:16px; padding:18px; position:relative; overflow:hidden;
+  }
+  .answer-card::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:4px;
+    background:linear-gradient(180deg, var(--amber), var(--cyan));
+  }
+  .answer-card .dx-label{
+    font-family:var(--mono); font-size:10.5px; color:var(--amber);
+    letter-spacing:.14em; text-transform:uppercase; margin-bottom:6px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .confidence-pill{
+    font-family:var(--mono); font-size:10px; padding:2px 8px; border-radius:999px;
+    border:1px solid var(--line); color:var(--text-dim);
+  }
+  .confidence-pill.high{ border-color:var(--cyan); color:var(--cyan); }
+  .confidence-pill.low{ border-color:#ff8fa3; color:#ff8fa3; }
+  .answer-card h3{ font-family:var(--mono); font-size:19px; margin:0 0 12px; font-weight:700; word-break:break-word; }
+  .dx-row{ display:flex; gap:8px; padding:8px 0; border-top:1px dashed var(--line); font-size:13.5px; }
+  .dx-row:first-of-type{ border-top:none; }
+  .dx-row .k{ color:var(--text-faint); font-family:var(--mono); font-size:11px; min-width:108px; padding-top:2px; letter-spacing:.05em; text-transform:uppercase; }
+  .dx-row .v{ color:var(--text); flex:1; line-height:1.5; }
+  .dx-row .v.mono{ font-family:var(--mono); color:var(--cyan); }
+  .cat-pill{ display:inline-block; font-family:var(--mono); font-size:11px; padding:3px 9px; border-radius:999px; border:1px solid var(--line); }
+
+  .answer-fallback{
+    margin-top:12px; padding:13px 15px; border-radius:12px;
+    background:var(--void-2); border:1px solid #ff8fa3;
+    font-size:13px; color:var(--text-dim); line-height:1.6;
+  }
+  .answer-fallback b{ color:#ff8fa3; }
+  .candidate-list{ margin-top:10px; }
+  .list-item{
+    background:var(--void-2); border:1px solid var(--line); border-left:3px solid var(--line);
+    padding:11px 14px; border-radius:10px; margin-bottom:8px;
+    cursor:pointer; font-size:13.5px; color:var(--text-dim);
+  }
+  .list-item:hover{ border-color:var(--cyan); }
+  .list-item b{ color:var(--text); font-family:var(--mono); font-size:13.5px; font-weight:700; }
+  .list-item .badgex{
+    font-family:var(--mono); font-size:9.5px; letter-spacing:.08em;
+    padding:1px 6px; border-radius:5px; margin-left:6px; text-transform:uppercase;
+    border:1px solid var(--line); color:var(--text-faint);
+  }
+
+  .wa-btn{
+    width:100%; display:flex; align-items:center; justify-content:center; gap:8px;
+    background:var(--void-2); border:1px solid var(--line); border-radius:12px;
+    padding:13px; margin-top:10px; color:var(--text); font-weight:700; font-size:13px;
+    cursor:pointer; font-family:var(--sans);
+  }
+  .wa-btn:hover{ border-color:#25D366; }
+
+  .coming{
+    background:var(--void-2); border:1px dashed var(--line); border-radius:14px; padding:16px; text-align:center;
+    color:var(--text-dim); font-size:12.5px; line-height:1.7; margin-top:14px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="topbar">
+    <span class="who">👤 {{ username }}</span>
+    <a href="/logout">Logout →</a>
+  </div>
+  <div class="box">
+    <p class="eyebrow">VIP Portal</p>
+    <h1>Welcome back!</h1>
+    <p class="sub">Aapki membership active hai.</p>
+    <div class="badge">Membership khatam hone mein <span class="n">{{ days_left }} din</span> baaki ({{ expiry }} tak)</div>
+
+    <button class="upload-btn" onclick="document.getElementById('panicPhotoInput').click()">
+      <span class="icon">📷</span> Upload Your Panic
+    </button>
+    <input type="file" id="panicPhotoInput" accept="image/*" style="display:none" onchange="handlePanicPhoto(event)">
+    <p class="upload-hint">Panic screen ki photo daalein — chahe angle se ho, dhundhli ho, ya andheri — AI khud padh lega</p>
+    <div class="photo-preview" id="photoPreview">
+      <img id="photoPreviewImg" alt="Uploaded panic">
+      <span class="pv-name" id="photoPreviewName"></span>
+      <button class="pv-clear" onclick="clearPhoto()" aria-label="Remove">✕</button>
+    </div>
+    <button class="wa-btn" onclick="shareToWhatsApp()">💬 Photo seedha WhatsApp par bhejein</button>
+
+    <div id="answerArea"></div>
+
+    <div class="coming">
+      🚧 DC power supply reading decoder aur model-wise fault library (photo/video ke saath) yahan jald hi add honge.
+    </div>
+  </div>
+</div>
+
+<script src="/panic-data.js"></script>
+<script>
+const CATEGORY_META = {
+  "SMC PANIC": { label:"SMC PANIC", cls:"cat-smc" },
+  "WATCHDOG":  { label:"WATCHDOG", cls:"cat-watchdog" },
+  "I2C":       { label:"I2C", cls:"cat-i2c" },
+  "AOP":       { label:"AOP", cls:"cat-aop" }
+};
+
+function getDecimal(code) {
+    const trimmed = code.trim();
+    if (/^0x[0-9a-f]+$/i.test(trimmed)) return parseInt(trimmed, 16);
+    return null;
+}
+
+function badgeFor(cat){
+  const meta = CATEGORY_META[cat];
+  return meta ? meta.label : cat;
+}
+
+function showProcessing(text){
+    document.getElementById('answerArea').innerHTML = `<div class="processing"><span class="spinner"></span><span id="processingLabel">${text}</span></div>`;
+}
+function updateProcessing(text){
+    const label = document.getElementById('processingLabel');
+    if (label) label.textContent = text;
+}
+function hideProcessing(){
+    document.getElementById('answerArea').innerHTML = "";
+}
+
+async function shareToWhatsApp(){
+    const fileInput = document.getElementById('panicPhotoInput');
+    const file = fileInput.files[0];
+    if (!file) { alert('Pehle "Upload Your Panic" se photo select karein.'); return; }
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+            await navigator.share({ files: [file], title: 'Panic Photo', text: 'Panic photo bhej raha hoon, please dekh lijiye.' });
+        } catch (e) { /* cancelled */ }
+    } else {
+        window.open('https://wa.me/919729421921?text=' + encodeURIComponent('Panic photo bhej raha hoon, please dekh lijiye.'), '_blank');
+        alert('Aapka browser seedha photo share support nahi karta. WhatsApp khul gaya hai — wahan photo manually attach kar dein.');
+    }
+}
+
+function clearPhoto(){
+    document.getElementById('photoPreview').classList.remove('show');
+    document.getElementById('panicPhotoInput').value = "";
+    hideProcessing();
+}
+
+function handlePanicPhoto(event){
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+    document.getElementById('photoPreviewImg').src = url;
+    document.getElementById('photoPreviewName').textContent = file.name;
+    document.getElementById('photoPreview').classList.add('show');
+
+    showProcessing("Photo AI ko bheji ja rahi hai...");
+
+    const formData = new FormData();
+    formData.append('panic_image', file);
+
+    fetch('/scan-panic', { method: 'POST', body: formData })
+        .then(res => {
+            if (!res.ok) throw new Error("Server error (" + res.status + ")");
+            return res.json();
+        })
+        .then(data => {
+            if (!data.success) throw new Error(data.error || "AI se jawab nahi mila");
+            updateProcessing("Panic code decode ho raha hai...");
+            setTimeout(() => analyzeOcrText(data.text || ""), 200);
+        })
+        .catch(err => {
+            hideProcessing();
+            renderPhotoFallback([], "", "Photo analyze nahi ho payi (" + err.message + "). Internet check karein ya dubara try karein.");
+        });
+}
+
+function analyzeOcrText(rawText){
+    const text = (rawText || "").replace(/\\\//g, '/');
+    const upper = text.toUpperCase();
+
+    let categoryHint = null;
+    if (/USERSPACE\s+WATCHDOG\s+TIMEOUT/i.test(text) || /MISSING SENSOR/i.test(text)) categoryHint = "WATCHDOG";
+    else if (/AOP\s+PANIC/i.test(text) || /\bSCMTO\b/i.test(text)) categoryHint = "AOP";
+    else if (/SMC\s+PANIC/i.test(text)) categoryHint = "SMC PANIC";
+
+    const missingMatch = text.match(/Missing sensor\(s\):\s*([A-Za-z0-9]+)/i);
+    if (missingMatch) {
+        const code = missingMatch[1].toUpperCase();
+        const entry = panicData.find(e => e.code.toUpperCase() === code);
+        if (entry) return renderPhotoAnswer(entry, "high", "Missing sensor field se match hua");
+    }
+
+    if (/\bSCMTO\b/i.test(text)) {
+        const entry = panicData.find(e => e.code.toUpperCase() === "SCMTO");
+        if (entry) return renderPhotoAnswer(entry, "high", "AOP panic signature se match hua");
+    }
+
+    const arrayMatches = [...text.matchAll(/sensor array\s*0\s*-\s*\d+\s*is\s*([0-9xXa-fA-F,\s]+)/gi)];
+    const foundFromArray = [];
+    arrayMatches.forEach(m => {
+        const tokens = m[1].split(',').map(t => t.trim()).filter(Boolean);
+        tokens.forEach(tok => {
+            let val = null;
+            if (/^0x[0-9a-f]+$/i.test(tok)) val = parseInt(tok, 16);
+            else if (/^[0-9]+$/.test(tok)) val = parseInt(tok, 10);
+            if (val && val > 0) {
+                const hex = "0X" + val.toString(16).toUpperCase();
+                const entry = panicData.find(e => e.code.toUpperCase() === hex);
+                if (entry) foundFromArray.push(entry);
+            }
+        });
+    });
+    if (foundFromArray.length === 1) {
+        return renderPhotoAnswer(foundFromArray[0], "high", "Sensor array fault value se decode hua");
+    }
+    if (foundFromArray.length > 1) {
+        return renderPhotoFallback(foundFromArray, text, "Panic mein ek se zyada sensor array value mili — sabse sambhavit ye hain:");
+    }
+
+    const candidates = panicData
+        .filter(item => {
+            const code = item.code.trim();
+            if (code.length < 3) return false;
+            return upper.includes(code.toUpperCase());
+        })
+        .sort((a, b) => b.code.length - a.code.length);
+
+    if (candidates.length) {
+        let pool = candidates;
+        if (categoryHint) {
+            const hinted = candidates.filter(c => c.category === categoryHint);
+            if (hinted.length) pool = hinted;
+        }
+        const top = pool[0];
+        const rest = pool.slice(1, 4);
+        if (rest.length === 0) {
+            return renderPhotoAnswer(top, "medium", "Panic text mein code keyword match hua");
+        }
+        return renderPhotoFallback(pool.slice(0, 4), text, "Photo se exact ek match confirm nahi ho paya — sabse sambhavit options:");
+    }
+
+    renderPhotoFallback([], text, "Is photo mein koi known panic code detect nahi hua. Photo saaf aur seedhi kheenchein.");
+}
+
+function renderPhotoAnswer(entry, confidence, reason){
+    hideProcessing();
+    const dec = getDecimal(entry.code);
+    const decRow = dec !== null ? `<div class="dx-row"><span class="k">Decimal</span><span class="v mono">${dec}</span></div>` : "";
+    const confClass = confidence === "high" ? "high" : (confidence === "low" ? "low" : "");
+    const box = document.getElementById('answerArea');
+    box.innerHTML = `
+      <div class="answer-card">
+        <div class="dx-label">📷 Photo diagnostic result <span class="confidence-pill ${confClass}">${confidence} confidence</span></div>
+        <h3>${entry.code}</h3>
+        ${decRow}
+        <div class="dx-row"><span class="k">Likely cause</span><span class="v">${entry.cause}</span></div>
+        <div class="dx-row"><span class="k">Category</span><span class="v"><span class="cat-pill">${entry.category}</span></span></div>
+        <div class="dx-row"><span class="k">Matched via</span><span class="v" style="color:var(--text-faint); font-size:12px;">${reason}</span></div>
+      </div>`;
+}
+
+function renderPhotoFallback(candidates, ocrText, message){
+    hideProcessing();
+    const box = document.getElementById('answerArea');
+    let candHtml = "";
+    if (candidates.length) {
+        candHtml = `<div class="candidate-list">` + candidates.map(item => {
+            const dec = getDecimal(item.code);
+            const decLabel = dec !== null ? ` <span style="color:var(--text-faint)">(dec ${dec})</span>` : "";
+            return `<div class="list-item" onclick="renderPhotoAnswer(panicData[${panicData.indexOf(item)}],'medium','Manually confirm kiya gaya')"><b>${item.code}</b>${decLabel} — ${item.cause}<span class="badgex">${badgeFor(item.category)}</span></div>`;
+        }).join('') + `</div>`;
+    }
+    box.innerHTML = `
+      <div class="answer-fallback">
+        <b>Confirm nahi ho paya:</b> ${message}
+      </div>
+      ${candHtml}`;
+}
+</script>
+</body>
+</html>
