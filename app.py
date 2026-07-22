@@ -73,6 +73,19 @@ def load_database():
 def home():
     return render_template('index.html')
 
+# Explicit no-cache route for the panic database — prevents browsers/CDNs from
+# serving a stale cached copy after we update the data (was causing 304s with old data)
+@app.route('/panic-data.js')
+def panic_data_js():
+    file_path = os.path.join(os.path.dirname(__file__), 'panic-data.js')
+    with open(file_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    response = app.response_class(content, mimetype='application/javascript')
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
 @app.route('/decode', methods=['POST'])
 def decode():
     data = request.json
