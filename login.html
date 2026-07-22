@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIP Login — Aamir Khan AI Panic Solution</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0a0e14; --void-2:#0d131c; --panel:#111925; --panel-2:#161f2d;
+    --line:#243248; --text:#e8eef5; --text-dim:#8fa1b8; --text-faint:#5b6b83;
+    --amber:#ffb454; --cyan:#5eead4; --rose:#ff8fa3;
+    --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    font-family:var(--sans); color:var(--text); padding:20px;
+    background: radial-gradient(1100px 700px at 15% -10%, #142033 0%, transparent 55%), var(--void);
+  }
+  .box{
+    width:100%; max-width:380px; background:var(--panel); border:1px solid var(--line);
+    border-radius:20px; padding:28px 24px;
+  }
+  .eyebrow{ font-family:var(--mono); font-size:11px; letter-spacing:.16em; color:var(--amber); text-transform:uppercase; margin:0 0 8px; }
+  h1{ font-family:var(--mono); font-size:22px; margin:0 0 22px; }
+  label{ font-family:var(--mono); font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.08em; display:block; margin-bottom:6px; }
+  input{
+    width:100%; padding:13px 14px; border-radius:10px; border:1px solid var(--line);
+    background:var(--void-2); color:var(--text); font-size:15px; margin-bottom:16px; font-family:var(--sans);
+  }
+  input:focus{ outline:none; border-color:var(--cyan); }
+  button{
+    width:100%; padding:14px; border-radius:10px; border:none; cursor:pointer;
+    background:linear-gradient(135deg, var(--amber), #ff9d4d); color:#1a1200; font-weight:800; font-size:14px;
+  }
+  .error{
+    background:#2a1418; border:1px solid var(--rose); color:var(--rose);
+    padding:10px 12px; border-radius:10px; font-size:13px; margin-bottom:16px;
+  }
+  .back{ display:block; text-align:center; margin-top:18px; color:var(--text-faint); font-size:12.5px; text-decoration:none; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <p class="eyebrow">VIP Access</p>
+    <h1>Login karein</h1>
+    {% if error %}<div class="error">{{ error }}</div>{% endif %}
+    <form method="POST">
+      <label>Username</label>
+      <input type="text" name="username" required autocomplete="username">
+      <label>Password</label>
+      <input type="password" name="password" required autocomplete="current-password">
+      <button type="submit">Login</button>
+    </form>
+    <a class="back" href="/">← Wapas home par jaayein</a>
+  </div>
+</body>
+</html>
