@@ -426,12 +426,12 @@
   <header class="hero">
     <p class="eyebrow">PRIVATE DIAGNOSTIC ENGINE<span class="rule"></span></p>
     <h1>Aamir Khan<br><span>AI Panic Solution</span></h1>
-    <p class="subtitle">Panic code ya keyword search karein — sahi faulty part turant maloom karein.</p>
+    <p class="subtitle">Enter a panic code or keyword to instantly find the faulty part.</p>
     <div class="stat-strip">
       <span class="stat-chip amber"><span class="n">217</span> signatures indexed</span>
       <span class="stat-chip cyan"><span class="n">AI</span> powered</span>
     </div>
-    <p class="section-label" style="margin-top:16px;">Contact — koi bhi query ho<span class="rule"></span></p>
+    <p class="section-label" style="margin-top:16px;">Contact — for any query<span class="rule"></span></p>
     <div class="contact-row">
       <a class="contact-btn wa" href="https://wa.me/919729421921" target="_blank" rel="noopener">
         <svg class="c-icon" viewBox="0 0 24 24" width="24" height="24" fill="#25D366"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2zm5.75 14.14c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.12.11-1.8-.11-.42-.13-.96-.31-1.65-.6-2.9-1.25-4.79-4.17-4.94-4.36-.14-.19-1.18-1.57-1.18-3 0-1.42.75-2.12 1.01-2.41.27-.29.58-.36.78-.36.19 0 .39 0 .56.01.18.01.42-.07.66.5.24.58.83 1.99.9 2.13.07.14.12.31.02.5-.09.19-.14.31-.28.48-.14.16-.29.36-.42.48-.14.14-.29.29-.12.57.16.28.72 1.19 1.55 1.93 1.06.95 1.96 1.24 2.24 1.38.28.14.44.12.6-.07.16-.19.68-.79.86-1.06.18-.28.36-.23.6-.14.24.09 1.55.73 1.82.86.27.14.44.2.51.31.07.11.07.65-.17 1.33z"/></svg>
@@ -451,7 +451,7 @@
   <div class="box">
     <p class="section-label">Search<span class="rule"></span></p>
     <div class="search-box">
-      <input type="text" id="searchInput" placeholder="Panic code ya keyword likhein..." onkeyup="if(event.key==='Enter')searchCode()">
+      <input type="text" id="searchInput" placeholder="e.g. 0X800, TG0B, or a keyword..." onkeyup="if(event.key==='Enter')searchCode()">
       <button class="search-btn" onclick="searchCode()" aria-label="Search">⌕</button>
     </div>
 
@@ -460,268 +460,30 @@
     <div id="result"></div>
 
     <button class="upload-btn" style="margin-top:14px;" onclick="toggleManualSearch()">
-      <span class="icon">🔤</span> Manual Search (A–Z)
+      <span class="icon">🔤</span> Manual Search
     </button>
 
     <div id="manualSearchArea" style="display:none; margin-top:12px;">
+      <p class="section-label">Browse by category<span class="rule"></span></p>
+      <div class="grid two" id="categoryGrid"></div>
+
+      <p class="section-label" style="margin-top:16px;">Browse by letter<span class="rule"></span></p>
       <div class="grid" id="alphabetGrid"></div>
       <div id="letterResults"></div>
     </div>
 
-    <p class="section-label" style="margin-top:22px;">Photo Analysis (VIP)<span class="rule"></span></p>
-
-    <div class="pin-gate" id="pinGate">
-      <div class="lock-icon">🔒</div>
-      <p>Ye feature paid VIP customers ke liye hai.<br>Access PIN WhatsApp/Instagram par payment ke baad milega.</p>
-      <div class="pin-row">
-        <input type="text" id="pinInput" placeholder="PIN daalein" inputmode="numeric" onkeyup="if(event.key==='Enter')checkPin()">
-        <button onclick="checkPin()">Unlock</button>
-      </div>
-    </div>
-
-    <div id="uploadUnlocked">
-      <div class="upload-section">
-        <button class="upload-btn" onclick="document.getElementById('panicPhotoInput').click()">
-          <span class="icon">📷</span> Upload Your Panic
-        </button>
-        <input type="file" id="panicPhotoInput" accept="image/*" style="display:none" onchange="handlePanicPhoto(event)">
-        <p class="upload-hint">Panic screen ki photo daalein — chahe angle se ho, dhundhli ho, ya andheri — AI khud padh lega</p>
-        <div class="photo-preview" id="photoPreview">
-          <img id="photoPreviewImg" alt="Uploaded panic">
-          <span class="pv-name" id="photoPreviewName"></span>
-          <button class="pv-clear" onclick="clearPhoto()" aria-label="Remove">✕</button>
-        </div>
-        <button class="contact-btn wa" style="width:100%; flex-direction:row; margin-top:10px; justify-content:center;" onclick="shareToWhatsApp()">
-          <span class="c-icon">💬</span> Photo seedha WhatsApp par bhejein
-        </button>
-      </div>
-    </div>
+    <p class="section-label" style="margin-top:22px;">VIP Access<span class="rule"></span></p>
+    <a class="upload-btn" href="/login" style="text-decoration:none; display:flex;">
+      <span class="icon">🔐</span> VIP Login — Photo Analysis, Power Reference &amp; More
+    </a>
+    <p class="upload-hint">Membership WhatsApp/Instagram par payment ke baad milti hai.</p>
   </div>
 
   <footer>PANIC/DX — text search offline · photo analysis AI-powered (secure server)</footer>
 </div>
 
+<script src="/panic-data.js"></script>
 <script>
-const panicData = [
-{code:"0X80000",category:"SMC PANIC",cause:"It's the Proximity Flex Cable"},
-{code:"0X140000",category:"SMC PANIC",cause:"It's the Charging Port & Power Button Flex or Barometer"},
-{code:"0X180000",category:"SMC PANIC",cause:"It's the Prox Flex & Power Button Flex"},
-{code:"0X20000",category:"SMC PANIC",cause:"It's a Sandwich Board Issue / Gyro"},
-{code:"0X40000",category:"SMC PANIC",cause:"It's the Charging Port Flex"},
-{code:"0X60000",category:"SMC PANIC",cause:"It's the Proximity Flex Cable"},
-{code:"0X1800",category:"SMC PANIC",cause:"It's Both - Charging Port Flex & Prox Flex"},
-{code:"0X10000",category:"SMC PANIC",cause:"It's the Power Button Flex"},
-{code:"0X400",category:"SMC PANIC",cause:"Try to Reball Interposer"},
-{code:"0X800",category:"SMC PANIC",cause:"It's the Charging Port Flex"},
-{code:"0X1000",category:"SMC PANIC",cause:"It's the Proximity Flex Cable"},
-{code:"0X194",category:"SMC PANIC",cause:"Problem with magnetometer or compass sensor"},
-{code:"0X204",category:"SMC PANIC",cause:"Problem with humidity sensor or moisture detection"},
-{code:"0X214",category:"SMC PANIC",cause:"Problem with pressure sensor or air pressure detection"},
-{code:"0X164",category:"SMC PANIC",cause:"Problem with pressure sensor"},
-{code:"0X174",category:"SMC PANIC",cause:"Problem with accelerometer or gravity sensor"},
-{code:"0X184",category:"SMC PANIC",cause:"Problem with gyroscope or rotation sensor"},
-{code:"0X134",category:"SMC PANIC",cause:"Problem with proximity sensor or light sensor"},
-{code:"0X144",category:"SMC PANIC",cause:"Problem with ambient temperature sensor"},
-{code:"0X154",category:"SMC PANIC",cause:"Problem with humidity sensor"},
-{code:"0X104",category:"SMC PANIC",cause:"Problem with accelerometer or gravity sensor"},
-{code:"0X114",category:"SMC PANIC",cause:"Problem with gyroscope or rotation sensor"},
-{code:"0X124",category:"SMC PANIC",cause:"Problem with magnetometer or compass sensor"},
-{code:"0X91",category:"SMC PANIC",cause:"Problem with network connectivity (Wi-Fi or cellular)"},
-{code:"0X93",category:"SMC PANIC",cause:"Problem with gyroscope"},
-{code:"0X94",category:"SMC PANIC",cause:"Problem with camera or imaging system"},
-{code:"0X81",category:"SMC PANIC",cause:"Problem with camera or imaging system"},
-{code:"0X83",category:"SMC PANIC",cause:"Problem with proximity sensor or screen auto-dimming"},
-{code:"0X84",category:"SMC PANIC",cause:"Problem with vibration motor or haptic feedback"},
-{code:"0X71",category:"SMC PANIC",cause:"Problem with audio or speaker system"},
-{code:"0X73",category:"SMC PANIC",cause:"Problem with ambient light sensor / auto brightness"},
-{code:"0X74",category:"SMC PANIC",cause:"Problem with speaker or audio output"},
-{code:"0X61",category:"SMC PANIC",cause:"Problem with display (flickering or pixelation)"},
-{code:"0X63",category:"SMC PANIC",cause:"Problem with accelerometer or motion sensor"},
-{code:"0X64",category:"SMC PANIC",cause:"Problem with microphone or audio input"},
-{code:"0X41",category:"SMC PANIC",cause:"Battery Data issue"},
-{code:"0X42",category:"SMC PANIC",cause:"Thermal issue (overheating)"},
-{code:"0X51",category:"SMC PANIC",cause:"Problem with security features or encryption"},
-{code:"0X1D4",category:"SMC PANIC",cause:"Problem with gyroscope or orientation sensor"},
-{code:"0X1E4",category:"SMC PANIC",cause:"Problem with barometer or altitude sensor"},
-{code:"0X1F4",category:"SMC PANIC",cause:"Problem with thermometer or temperature sensor"},
-{code:"0X1A4",category:"SMC PANIC",cause:"Problem with proximity sensor or light sensor"},
-{code:"0X1B4",category:"SMC PANIC",cause:"Problem with ambient light sensor / auto brightness"},
-{code:"0X1C4",category:"SMC PANIC",cause:"Problem with proximity sensor or screen auto-dimming"},
-{code:"Dart-disp0 SMMU error",category:"SMC PANIC",cause:"Rear Camera"},
-{code:"DPC error",category:"SMC PANIC",cause:"Hard disk and baseband circuit, crystal oscillator"},
-{code:"Ememory",category:"SMC PANIC",cause:"Hard Disk or Hard Disk related circuit"},
-{code:"Unknown sample rate on DAC",category:"SMC PANIC",cause:"Audio"},
-{code:"Firmware fatal",category:"SMC PANIC",cause:"Firmware or underlying issue, or Power Button line"},
-{code:"fed err (parity counter overflow, multi hit ICTAG)",category:"SMC PANIC",cause:"Hard Disk"},
-{code:"Fatal coherency point error CP_com_NORM",category:"SMC PANIC",cause:"BUCK CPU power supply problem, CPU side inductance"},
-{code:"Halt/Restart Timed out",category:"SMC PANIC",cause:"Tail Plug / Earphone Amplifier"},
-{code:"Initproc exited -- exit",category:"SMC PANIC",cause:"Try software reflash or CPU reball"},
-{code:"Invalid queue element linkage",category:"SMC PANIC",cause:"Hard Disk is welded or damaged"},
-{code:"Initproc exited",category:"SMC PANIC",cause:"Main crystal failure"},
-{code:"IOMFB int hander",category:"SMC PANIC",cause:"Screen or screen 0.8V power supply"},
-{code:"Key hdr kind!=NEW",category:"SMC PANIC",cause:"Display IC"},
-{code:"Kernel data abort",category:"SMC PANIC",cause:"Hard Disk / Board Layer"},
-{code:"L2C",category:"SMC PANIC",cause:"WiFi / Audio Amplification"},
-{code:"LLC Bus error from cpu3 (FAR)",category:"SMC PANIC",cause:"Abnormal communication between CPU and WiFi"},
-{code:"LSU",category:"SMC PANIC",cause:"WiFi"},
-{code:"LLC",category:"SMC PANIC",cause:"Baseband circuitry, possibly audio"},
-{code:"lop_rinobuffer",category:"SMC PANIC",cause:"Audio related"},
-{code:"Memorystatus_jetsam_thread",category:"SMC PANIC",cause:"Hard Disk"},
-{code:"Mbuf_watchdog:12 waiters stuck",category:"SMC PANIC",cause:"Boot Cable / Tail Plug / Power Button"},
-{code:"mbuf_watchdog:2 waiters stuck",category:"SMC PANIC",cause:"Hard Disk has bad sectors"},
-{code:"Nvme",category:"SMC PANIC",cause:"Hard Disk"},
-{code:"NO pulse on",category:"SMC PANIC",cause:"Vibration / Pulse (ring vibration)"},
-{code:"Pmap_enter_pv unexpected PV head",category:"SMC PANIC",cause:"Earpiece row, small audio"},
-{code:"PMP NMI FIQ",category:"SMC PANIC",cause:"CPU Power Supply"},
-{code:"Pre, next",category:"SMC PANIC",cause:"Main Crystal Failure"},
-{code:"Reset sequence did not finish within 5000ms",category:"SMC PANIC",cause:"Abnormal communication between CPU and WiFi"},
-{code:"Rtunref Bad refcnt",category:"SMC PANIC",cause:"Hard Disk"},
-{code:"RTBuddy (AOP) setmanagedGated",category:"SMC PANIC",cause:"Battery Holder"},
-{code:"Releasing non_exclusive",category:"SMC PANIC",cause:"CPU Inductor"},
-{code:"Sep memory protection module error",category:"SMC PANIC",cause:"EEPROM (screen / CPU / Baseband)"},
-{code:"SEP ROM",category:"SMC PANIC",cause:"Fingerprint ROM / Logic Chip"},
-{code:"Sep ROM boot Panic",category:"SMC PANIC",cause:"EEPROM CPU, Resistors or CPU"},
-{code:"SEP Panic::dxio/I2C: 0X100007785",category:"SMC PANIC",cause:"EEPROM CPU, Resistors or CPU"},
-{code:"SEP Panic::sars/sars: 0X10000f439",category:"SMC PANIC",cause:"EEPROM CPU, Resistors or CPU"},
-{code:"SMC DATA ABORT",category:"SMC PANIC",cause:"Abnormal CPU Communication"},
-{code:"Stacks+routined-(2019 01 29)",category:"SMC PANIC",cause:"iPad - usually caused by battery screw post being too long (Special iPad)"},
-{code:"sks request timeout",category:"SMC PANIC",cause:"CPU to logic code fragment line / EEPROM"},
-{code:"Sleep/wake hang detected",category:"SMC PANIC",cause:"Battery, Audio CPU powered"},
-{code:"SEP panic::daio/i2c",category:"SMC PANIC",cause:"Down antenna problem"},
-{code:"SMC PANIC",category:"SMC PANIC",cause:"CPU power supply - check inductance"},
-{code:"Spmi timeout",category:"SMC PANIC",cause:"Audio related"},
-{code:"SEP Panic sars/sars",category:"SMC PANIC",cause:"Earpiece row, small audio"},
-{code:"Timeout waiting for stop to IDLE on EP",category:"SMC PANIC",cause:"Screen"},
-{code:"Trying to change a collection in the registry",category:"SMC PANIC",cause:"Just flash"},
-{code:"Void applesynopsysMIPID",category:"SMC PANIC",cause:"SI Controller"},
-{code:"0XD4",category:"SMC PANIC",cause:"Problem with ambient temperature sensor"},
-{code:"0XE4",category:"SMC PANIC",cause:"Problem with humidity sensor"},
-{code:"0XF4",category:"SMC PANIC",cause:"Problem with pressure sensor"},
-{code:"0XA4",category:"SMC PANIC",cause:"Problem with touch screen or digitizer"},
-{code:"0XB4",category:"SMC PANIC",cause:"Problem with SIM card or cellular connectivity"},
-{code:"0XC4",category:"SMC PANIC",cause:"Problem with fingerprint sensor or biometric auth"},
-{code:"0XD1",category:"SMC PANIC",cause:"Problem with vibration motor or haptic feedback"},
-{code:"0XE1",category:"SMC PANIC",cause:"Problem with ambient light sensor or proximity sensor"},
-{code:"0XF1",category:"SMC PANIC",cause:"Problem with gyroscope or accelerometer"},
-{code:"0XA1",category:"SMC PANIC",cause:"Problem with GPS or location services"},
-{code:"0XB1",category:"SMC PANIC",cause:"Problem with Touch ID or Face ID functionality"},
-{code:"0XC1",category:"SMC PANIC",cause:"Problem with microphone or audio input"},
-{code:"0Xa1",category:"SMC PANIC",cause:"Battery Communications"},
-{code:"0XD00000",category:"SMC PANIC",cause:"Sensor-related (accelerometer, gyroscope, proximity, ambient light)"},
-{code:"0XF00000",category:"SMC PANIC",cause:"Miscellaneous hardware issue (buttons, connectors, hardware integrity)"},
-{code:"0XA00000",category:"SMC PANIC",cause:"Battery-related issue"},
-{code:"0XB00000",category:"SMC PANIC",cause:"Audio-related issue (speakers, mic, headphone jack, output)"},
-{code:"0X1C0000",category:"SMC PANIC",cause:"Charging Port & Power Button Flex & Prox Flex"},
-{code:"0XC0000",category:"SMC PANIC",cause:"Prox Flex & Charging Port Flex"},
-{code:"0XC00000",category:"SMC PANIC",cause:"Security feature issue (Touch ID / Face ID / Secure Enclave)"},
-{code:"0X700000",category:"SMC PANIC",cause:"Charging flex & wireless charging flex"},
-{code:"0X800000",category:"SMC PANIC",cause:"Software-related issue (17pro max) wireless flex"},
-{code:"0X400000",category:"SMC PANIC",cause:"Wireless Charging Flex (back glass)"},
-{code:"0X500000",category:"SMC PANIC",cause:"Battery Communications"},
-{code:"0X600000",category:"SMC PANIC",cause:"Wireless charging flex & proximity flex"},
-{code:"0X100000",category:"SMC PANIC",cause:"Power Button Flex / Charging Port Flex"},
-{code:"0X200000",category:"SMC PANIC",cause:"Proximity Flex Cable"},
-{code:"0X300000",category:"SMC PANIC",cause:"Proximity Flex Cable / camera issue (autofocus, image stabilization)"},
-{code:"TT1P TT2P",category:"SMC PANIC",cause:"Screen"},
-{code:"TG0B",category:"SMC PANIC",cause:"Battery - No Data"},
-{code:"TG0V TTSA",category:"SMC PANIC",cause:"Charging Port Flex"},
-{code:"Prs0",category:"SMC PANIC",cause:"Charging Port Flex / U7400"},
-{code:"MIC1",category:"SMC PANIC",cause:"Charging Port Flex"},
-{code:"MIC2",category:"SMC PANIC",cause:"Power Key Flex / SpringBoard"},
-{code:"600seconds",category:"SMC PANIC",cause:"Hard Disk (Nand)"},
-{code:"Systick watchdog",category:"SMC PANIC",cause:"Big Audio"},
-{code:"Systick watchdog2 not pet",category:"SMC PANIC",cause:"Gyro"},
-{code:"No pulse on",category:"SMC PANIC",cause:"Big Audio / Front SP / Vibration"},
-{code:"AMCC ERROR",category:"SMC PANIC",cause:"Front SP"},
-{code:"AOP PANIC (7P)",category:"SMC PANIC",cause:"Proximity sensing / rear MIC 7P / power-on flex / fingerprint"},
-{code:"AOP PANIC (general)",category:"SMC PANIC",cause:"Big Audio / Screen Failure"},
-{code:"AOP DATA ABORT",category:"SMC PANIC",cause:"Hard Drive first, then check CPU solder joint"},
-{code:"K2-bosch control",category:"SMC PANIC",cause:"Vibrator"},
-{code:"PressureController.cpp:280",category:"SMC PANIC",cause:"Check L3302 layer / rear camera / distance sensor / rear MIC 7P boot cable / fingerprint"},
-{code:"Attempting to forcibly halt CPU",category:"SMC PANIC",cause:"CPU Solder Joint"},
-{code:"AMCC Error",category:"SMC PANIC",cause:"Light-sensitive"},
-{code:"AppleBCMWLAN",category:"SMC PANIC",cause:"WiFi Bluetooth"},
-{code:"Anc-postnand.c1260 assert failed link",category:"SMC PANIC",cause:"Nand problem"},
-{code:"AGXK AGXAccelerator",category:"SMC PANIC",cause:"Gyroscope Accelerator Coprocessor"},
-{code:"AppleSOC hot hot hot",category:"SMC PANIC",cause:"WiFi / Big Audio / CPU reflow needed"},
-{code:"ANS",category:"SMC PANIC",cause:"Hard Disk circuit or board layer"},
-{code:"ANS2",category:"SMC PANIC",cause:"Hard Disk circuit or board layer"},
-{code:"AOP NMI POWER",category:"SMC PANIC",cause:"Front Cable / Power Button Cable"},
-{code:"Apple PMGR",category:"SMC PANIC",cause:"Battery"},
-{code:"Apple PPM",category:"SMC PANIC",cause:"Charging IC / Battery Conversion"},
-{code:"apcie (wlan)",category:"SMC PANIC",cause:"WiFi Module"},
-{code:"A freed zone element has been modified",category:"SMC PANIC",cause:"CPU Solder Joint"},
-{code:"A kext releasing",category:"SMC PANIC",cause:"First consider CPU inductance"},
-{code:"apcie(0:s3e)",category:"SMC PANIC",cause:"Hard Disk"},
-{code:"AppleHIDTransportProtocol",category:"SMC PANIC",cause:"Screen"},
-{code:"APFS_TREE",category:"SMC PANIC",cause:"Hard Disk (Nand)"},
-{code:"Bad tallq elm",category:"SMC PANIC",cause:"Main Crystal Oscillator / Wide-Angle Camera / Screen"},
-{code:"BASEBAND cluster_push",category:"SMC PANIC",cause:"Baseband part"},
-{code:"err:expectedNULL",category:"SMC PANIC",cause:"Load software (reflash)"},
-{code:"Coherency point error",category:"SMC PANIC",cause:"Check the rear camera"},
-{code:"CP_COM_NORM REQUEST",category:"SMC PANIC",cause:"CPU Hard Disk / Camera Circuit"},
-{code:"CSL AUDIO",category:"SMC PANIC",cause:"Audio related"},
-{code:"SCMto",category:"AOP",cause:"Vibration"},
-{code:"Systick wacthdog",category:"AOP",cause:"Big audio"},
-{code:"Systick wacthdog2 not pet",category:"AOP",cause:"Gyro"},
-{code:"no pluse on",category:"AOP",cause:"Big audio sp/vibration/front sp"},
-{code:"AMCC  ERROR",category:"AOP",cause:"Front speker"},
-{code:"AOP PANIC(7P)",category:"AOP",cause:"Proximity sensor flrx rear( mic 7P) ON/OFF Flex/finger print"},
-{code:"(AOP PANIC)",category:"AOP",cause:"BIG AUDIO screen failure"},
-{code:"AOP DATA ABORT",category:"AOP",cause:"First nand/ (cpu)"},
-{code:"k2-bosch control",category:"AOP",cause:"Vibration"},
-{code:"pressureController.cpp:280",category:"AOP",cause:"Layer /rear camera/check distance sensor (7p) rear mic boot cable /check fimger print"},
-{code:"TT1P TT2P",category:"WATCHDOG",cause:"SCREEN"},
-{code:"TG0B",category:"WATCHDOG",cause:"BATTERY NO DATA"},
-{code:"TP3R",category:"WATCHDOG",cause:"NTC PROBLEM"},
-{code:"TP2A /TP3R /TP4H",category:"WATCHDOG",cause:"BATTERY/SCREEN"},
-{code:"TP2C",category:"WATCHDOG",cause:"BATTERY/SCREEN"},
-{code:"TG0V/ TTSA",category:"WATCHDOG",cause:"Charging flex cable"},
-{code:"Prs0",category:"WATCHDOG",cause:"Charging flex cable"},
-{code:"mic1",category:"WATCHDOG",cause:"Charging flex cable"},
-{code:"mic2",category:"WATCHDOG",cause:"Power flex/flash light flax"},
-{code:"spring board",category:"WATCHDOG",cause:"First restore/reball sandwich board"},
-{code:"600seconds",category:"WATCHDOG",cause:"NAND (HARD DISK)"},
-{code:"without the above code",category:"WATCHDOG",cause:"U2 priorty(tristar-hydra)"},
-{code:"Attemping to forcibly halt CPU",category:"SMC PANIC",cause:"CPU Solder Joint"},
-{code:"Anc-postnand.c1260 asser failed link",category:"SMC PANIC",cause:"Nand problem"},
-{code:"AAPLE PMGR",category:"SMC PANIC",cause:"Battery"},
-{code:"apcie(wlan)",category:"SMC PANIC",cause:"WIFI /LAYER"},
-{code:"a freed zone elements has been modified",category:"SMC PANIC",cause:"CPU REBALL"},
-{code:"appleHIDTrabsport ocol",category:"SMC PANIC",cause:"SCREEN"},
-{code:"busy timeout",category:"SMC PANIC",cause:"Audio/PMIC"},
-{code:"baseband",category:"SMC PANIC",cause:"Layer baseband cpu and circit"},
-{code:"cluster_pusherr:expactedNULL",category:"SMC PANIC",cause:"SOFTWARE LOAD"},
-{code:"CLS AUDIO",category:"SMC PANIC",cause:"Audio related"},
-{code:"CAN Snoop",category:"SMC PANIC",cause:"Ply stub"},
-{code:"DCP PANIC",category:"SMC PANIC",cause:"Charging flex"},
-{code:"DCP err UNKOWN:MULTIPLE)on..",category:"SMC PANIC",cause:"PMU/BUCK COIL /CPU"},
-{code:"DPC err",category:"SMC PANIC",cause:"Namd bb cristal"},
-{code:"enableHalogen;3833 unknow samle rate on..",category:"SMC PANIC",cause:"Audio"},
-{code:"fed err (parity counter overflow multi hit ICTAG)",category:"SMC PANIC",cause:"Nand problem"},
-{code:"Halt /restart Time out",category:"SMC PANIC",cause:"Tail plug /earphone Amplifier"},
-{code:"Iokit",category:"SMC PANIC",cause:"Iokit"},
-{code:"initproc exited --exit",category:"SMC PANIC",cause:"First software/CPU Reball"},
-{code:"initproc-exited",category:"SMC PANIC",cause:"Main crystal"},
-{code:"Key hdr kind'=NEW",category:"SMC PANIC",cause:"Display Ic"},
-{code:"LLC Bus error from cpu 3: FAR",category:"SMC PANIC",cause:"Layer wifi to cpu conections"},
-{code:"menorystaus_jetsam_thread",category:"SMC PANIC",cause:"Nand problem"},
-{code:"mMbuf_wacthdog:12 waiters stuck",category:"SMC PANIC",cause:"On/off flex/charging flex cable/"},
-{code:"mubf_wacthdog:2waiters stuck",category:"SMC PANIC",cause:"Nand problem"},
-{code:"Pmap-enter_ov.unesxpected pv head",category:"SMC PANIC",cause:"Earpice section small audio ic"},
-{code:"pre,next",category:"SMC PANIC",cause:"Main crystal"},
-{code:"reset sequence did not finish witin S00ms",category:"SMC PANIC",cause:"Abnormal communicatinon between COU &WIFI"},
-{code:"Rtunerf Bad refcnt",category:"SMC PANIC",cause:"Nand problem"},
-{code:"Relesing non_exclusive",category:"SMC PANIC",cause:"CPU REBALL"},
-{code:"Stack+routined_2019 01 29",category:"SMC PANIC",cause:"The ipad is mostly caused by the battry screw post being long (special Ipad)"},
-{code:"SEP Panic ::sars/|sars 0x10000f439",category:"SMC PANIC",cause:"CPU /EEPROM RESISTOR OR CPU"},
-{code:"SEP Panic :dxio/|i2c0x100007785",category:"SMC PANIC",cause:"CPU /EEPROM RESISTOR OR CPU"},
-{code:"sep memory protection moddule error",category:"SMC PANIC",cause:"EEPROM (SCREEN/CPU/BASEBAND)"},
-{code:"Void appleseynopsysMIPIDSIController",category:"SMC PANIC",cause:"Front cable"},
-{code:"WTD timeout",category:"SMC PANIC",cause:"Battery /battery connector"},
-{code:"WKDMD ERROR code 0x2",category:"SMC PANIC",cause:"Flashig error /nand problem"}
-];
-
 const CATEGORY_META = {
   "SMC PANIC": { label:"SMC PANIC — Assertion", glyph:"01 · CORE", cls:"cat-smc" },
   "WATCHDOG":  { label:"Userspace Watchdog Timeout", glyph:"02 · TIMEOUT", cls:"cat-watchdog" },
@@ -756,11 +518,41 @@ function toggleManualSearch(){
     area.style.display = isHidden ? 'block' : 'none';
     if (isHidden && !manualSearchBuilt) {
         buildAlphabetGrid();
+        buildCategoryGrid();
         manualSearchBuilt = true;
     }
     if (!isHidden) {
         document.getElementById('letterResults').innerHTML = "";
     }
+}
+
+function buildCategoryGrid(){
+    const box = document.getElementById('categoryGrid');
+    box.innerHTML = "";
+    Object.keys(CATEGORY_META).forEach(cat => {
+        const meta = CATEGORY_META[cat];
+        const count = panicData.filter(e => e.category === cat).length;
+        const btn = document.createElement('button');
+        btn.className = 'tile ' + meta.cls;
+        btn.onclick = () => showByCategoryManual(cat);
+        btn.innerHTML = `<span class="tile-glyph">${meta.glyph}</span><span class="tile-name">${meta.label}</span><span class="tile-count">${count} entries</span>`;
+        box.appendChild(btn);
+    });
+}
+
+function showByCategoryManual(cat){
+    hideProcessing();
+    const found = panicData.filter(item => item.category === cat);
+    const box = document.getElementById('letterResults');
+    if (!found.length) {
+        box.innerHTML = `<div class="count">No entries in this category yet.</div>`;
+        return;
+    }
+    let html = `<div class="count">${found.length} results — tap to view solution</div>`;
+    found.forEach((item) => {
+        html += `<div class="anon-item" onclick="renderSolution(panicData[${panicData.indexOf(item)}])"><b>${item.code}</b></div>`;
+    });
+    box.innerHTML = html;
 }
 
 function buildAlphabetGrid() {
@@ -785,10 +577,10 @@ function showByLetterAnonymized(letter){
     const found = panicData.filter(item => item.code.trim().toUpperCase().startsWith(letter));
     const box = document.getElementById('letterResults');
     if (!found.length) {
-        box.innerHTML = `<div class="count">Is letter ke liye koi entry nahi hai.</div>`;
+        box.innerHTML = `<div class="count">No entries for this letter.</div>`;
         return;
     }
-    let html = `<div class="count">${found.length} results — tap karke solution dekhein</div>`;
+    let html = `<div class="count">${found.length} results — tap to view solution</div>`;
     found.forEach((item) => {
         html += `<div class="anon-item" onclick="renderSolution(panicData[${panicData.indexOf(item)}])"><b>${item.code}</b></div>`;
     });
@@ -824,7 +616,7 @@ function renderNotFound(){
     const box = document.getElementById('answerArea');
     box.innerHTML = `
       <div class="answer-fallback">
-        Is code/keyword ke liye koi exact result nahi mila. Sahi spelling/code check karein, ya WhatsApp par contact karein.
+        No exact result found for this code/keyword. Please check the spelling/code, or contact us via WhatsApp.
       </div>`;
 }
 
@@ -868,7 +660,7 @@ function findBestMatch(raw){
 
 function searchCode() {
     const raw = document.getElementById('searchInput').value.trim();
-    if (!raw) return alert("Pehle kuch likhein!");
+    if (!raw) return alert("Please enter something first!");
 
     document.getElementById('listBox').classList.remove('show');
     hideDetail();
@@ -883,187 +675,6 @@ function searchCode() {
             renderNotFound();
         }
     }, 1400);
-}
-
-/* ================= PHOTO UPLOAD + AI ANALYSIS (Flask + Gemini backend) ================= */
-
-const VALID_PIN = "9729"; // <-- Apna secret PIN yahan set karein, jab chahein badal dein
-
-function checkPin(){
-    const val = document.getElementById('pinInput').value.trim();
-    if (val === VALID_PIN) {
-        document.getElementById('pinGate').style.display = 'none';
-        document.getElementById('uploadUnlocked').style.display = 'block';
-    } else {
-        alert('Galat PIN. Sahi PIN ke liye WhatsApp/Instagram par contact karein.');
-    }
-}
-
-async function shareToWhatsApp(){
-    const fileInput = document.getElementById('panicPhotoInput');
-    const file = fileInput.files[0];
-    if (!file) {
-        alert('Pehle "Upload Your Panic" se photo select karein.');
-        return;
-    }
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-            await navigator.share({ files: [file], title: 'Panic Photo', text: 'Panic photo analysis ke liye bhej raha hoon.' });
-        } catch (e) { /* user cancelled share, ignore */ }
-    } else {
-        window.open('https://wa.me/919729421921?text=' + encodeURIComponent('Panic photo bhej raha hoon, please dekh lijiye.'), '_blank');
-        alert('Aapka browser seedha photo share support nahi karta. WhatsApp khul gaya hai — wahan photo manually attach kar dein.');
-    }
-}
-
-function clearPhoto(){
-    document.getElementById('photoPreview').classList.remove('show');
-    document.getElementById('panicPhotoInput').value = "";
-    hideProcessing();
-    document.getElementById('answerArea').innerHTML = "";
-}
-
-function handlePanicPhoto(event){
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const url = URL.createObjectURL(file);
-    document.getElementById('photoPreviewImg').src = url;
-    document.getElementById('photoPreviewName').textContent = file.name;
-    document.getElementById('photoPreview').classList.add('show');
-
-    document.getElementById('listBox').classList.remove('show');
-    hideDetail();
-    showProcessing("Photo AI ko bheji ja rahi hai...");
-
-    const formData = new FormData();
-    formData.append('panic_image', file);
-
-    fetch('/scan-panic', { method: 'POST', body: formData })
-        .then(res => {
-            if (!res.ok) throw new Error("Server error (" + res.status + ")");
-            return res.json();
-        })
-        .then(data => {
-            if (!data.success) throw new Error(data.error || "AI se jawab nahi mila");
-            updateProcessing("Panic code decode ho raha hai...");
-            setTimeout(() => analyzeOcrText(data.text || ""), 200);
-        })
-        .catch(err => {
-            hideProcessing();
-            renderPhotoFallback([], "", "Photo analyze nahi ho payi (" + err.message + "). Internet check karein ya dubara try karein.");
-        });
-}
-
-/* Precise extraction: reads the actual "S.sensor array ... is X, Y, Z" fault values
-   (same field a technician reads manually) and matches the nonzero value's hex form
-   against the panic database. Falls back to keyword/code substring scanning. */
-function analyzeOcrText(rawText){
-    const text = (rawText || "").replace(/\\\//g, '/');
-    const upper = text.toUpperCase();
-
-    let categoryHint = null;
-    if (/USERSPACE\s+WATCHDOG\s+TIMEOUT/i.test(text) || /MISSING SENSOR/i.test(text)) categoryHint = "WATCHDOG";
-    else if (/AOP\s+PANIC/i.test(text) || /\bSCMTO\b/i.test(text)) categoryHint = "AOP";
-    else if (/SMC\s+PANIC/i.test(text)) categoryHint = "SMC PANIC";
-
-    // 1) Missing sensor (watchdog) pattern
-    const missingMatch = text.match(/Missing sensor\(s\):\s*([A-Za-z0-9]+)/i);
-    if (missingMatch) {
-        const code = missingMatch[1].toUpperCase();
-        const entry = panicData.find(e => e.code.toUpperCase() === code);
-        if (entry) return renderPhotoAnswer(entry, "high", "Missing sensor field se match hua");
-    }
-
-    // 2) SCMto (AOP) direct signature
-    if (/\bSCMTO\b/i.test(text)) {
-        const entry = panicData.find(e => e.code.toUpperCase() === "SCMTO");
-        if (entry) return renderPhotoAnswer(entry, "high", "AOP panic signature se match hua");
-    }
-
-    // 3) Sensor-array fault value (the real diagnostic code technicians read manually)
-    const arrayMatches = [...text.matchAll(/sensor array\s*0\s*-\s*\d+\s*is\s*([0-9xXa-fA-F,\s]+)/gi)];
-    const foundFromArray = [];
-    arrayMatches.forEach(m => {
-        const tokens = m[1].split(',').map(t => t.trim()).filter(Boolean);
-        tokens.forEach(tok => {
-            let val = null;
-            if (/^0x[0-9a-f]+$/i.test(tok)) val = parseInt(tok, 16);
-            else if (/^[0-9]+$/.test(tok)) val = parseInt(tok, 10);
-            if (val && val > 0) {
-                const hex = "0X" + val.toString(16).toUpperCase();
-                const entry = panicData.find(e => e.code.toUpperCase() === hex);
-                if (entry) foundFromArray.push(entry);
-            }
-        });
-    });
-    if (foundFromArray.length === 1) {
-        return renderPhotoAnswer(foundFromArray[0], "high", "Sensor array fault value se decode hua");
-    }
-    if (foundFromArray.length > 1) {
-        return renderPhotoFallback(foundFromArray, text, "Panic mein ek se zyada sensor array value mili — sabse sambhavit ye hain:");
-    }
-
-    // 4) Fallback: scan every known code as a substring inside the AI text, prefer longer/more specific codes
-    const candidates = panicData
-        .filter(item => {
-            const code = item.code.trim();
-            if (code.length < 3) return false; // avoid noisy super-short matches
-            return upper.includes(code.toUpperCase());
-        })
-        .sort((a, b) => b.code.length - a.code.length);
-
-    if (candidates.length) {
-        let pool = candidates;
-        if (categoryHint) {
-            const hinted = candidates.filter(c => c.category === categoryHint);
-            if (hinted.length) pool = hinted;
-        }
-        const top = pool[0];
-        const rest = pool.slice(1, 4);
-        if (rest.length === 0) {
-            return renderPhotoAnswer(top, "medium", "Panic text mein code keyword match hua");
-        }
-        return renderPhotoFallback(pool.slice(0, 4), text, "Photo se exact ek match confirm nahi ho paya — sabse sambhavit options:");
-    }
-
-    // 5) Nothing matched at all
-    renderPhotoFallback([], text, "Is photo mein koi known panic code detect nahi hua. Photo saaf aur seedhi kheenchein, ya neeche search bar mein manually likhein.");
-}
-
-function renderPhotoAnswer(entry, confidence, reason){
-    hideProcessing();
-    const dec = getDecimal(entry.code);
-    const decRow = dec !== null ? `<div class="dx-row"><span class="k">Decimal</span><span class="v mono">${dec}</span></div>` : "";
-    const confClass = confidence === "high" ? "high" : (confidence === "low" ? "low" : "");
-    const box = document.getElementById('answerArea');
-    box.innerHTML = `
-      <div class="answer-card">
-        <div class="dx-label">📷 Photo diagnostic result <span class="confidence-pill ${confClass}">${confidence} confidence</span></div>
-        <h3>${entry.code}</h3>
-        ${decRow}
-        <div class="dx-row"><span class="k">Likely cause</span><span class="v">${entry.cause}</span></div>
-        <div class="dx-row"><span class="k">Category</span><span class="v"><span class="cat-pill">${entry.category}</span></span></div>
-        <div class="dx-row"><span class="k">Matched via</span><span class="v" style="color:var(--text-faint); font-size:12px;">${reason}</span></div>
-      </div>`;
-}
-
-function renderPhotoFallback(candidates, ocrText, message){
-    hideProcessing();
-    const box = document.getElementById('answerArea');
-    let candHtml = "";
-    if (candidates.length) {
-        candHtml = `<div class="candidate-list">` + candidates.map(item => {
-            const dec = getDecimal(item.code);
-            const decLabel = dec !== null ? ` <span style="color:var(--text-faint)">(dec ${dec})</span>` : "";
-            return `<div class="list-item" onclick="renderPhotoAnswer(panicData[${panicData.indexOf(item)}],'medium','Manually confirm kiya gaya')"><b>${item.code}</b>${decLabel} — ${item.cause}<span class="badge">${badgeFor(item.category)}</span></div>`;
-        }).join('') + `</div>`;
-    }
-    box.innerHTML = `
-      <div class="answer-fallback">
-        <b>Confirm nahi ho paya:</b> ${message}
-      </div>
-      ${candHtml}`;
 }
 
 </script>
